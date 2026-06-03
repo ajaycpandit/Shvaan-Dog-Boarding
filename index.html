@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#F5F2EC"/>
+<title>Pawboard 🐾</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;1,300&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #F5F2EC; --surface: #FFFFFF; --surface2: #EDEBE4; --surface3: #E4E0D8;
+  --border: #DDD9D0; --border2: #CECAC0;
+  --ink: #18160F; --ink2: #5C5847; --ink3: #9C9784;
+  --accent: #BF4A1E; --accent-light: #FAF0EB; --accent-border: #F2C4B0;
+  --green: #1E6B42; --green-bg: #EAF5EF; --green-border: #A7D7BC;
+  --amber: #8A5A10; --amber-bg: #FDF4E7;
+  --blue: #1A4F8A; --blue-bg: #EBF2FB;
+  --red: #991B1B; --red-bg: #FEF2F2;
+  --r: 10px; --r-sm: 7px; --r-lg: 14px;
+  --shadow: 0 2px 8px rgba(0,0,0,.08), 0 0 0 1px rgba(0,0,0,.04);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; }
+body { font-family: 'Epilogue', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+/* TYPOGRAPHY */
+h1 { font-family: 'Fraunces', serif; font-size: clamp(22px, 5vw, 30px); font-weight: 500; }
+h2 { font-family: 'Fraunces', serif; font-size: clamp(18px, 4vw, 24px); font-weight: 500; }
+h3 { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 500; }
+
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 18px; border-radius: var(--r-sm); border: 1.5px solid transparent; font-family: 'Epilogue', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all .15s; white-space: nowrap; text-decoration: none; }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { background: #A83D17; }
+.btn-secondary { background: var(--surface); color: var(--ink); border-color: var(--border); }
+.btn-secondary:hover { background: var(--surface2); }
+.btn-ghost { background: none; color: var(--ink2); border-color: transparent; }
+.btn-ghost:hover { background: var(--surface2); color: var(--ink); }
+.btn-danger { background: none; color: var(--red); border-color: #FECACA; }
+.btn-danger:hover { background: var(--red-bg); }
+.btn-success { background: var(--green); color: #fff; border-color: var(--green); }
+.btn-success:hover { background: #165733; }
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+.btn-xs { padding: 4px 9px; font-size: 12px; }
+.btn-block { width: 100%; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* FORMS */
+.fg { margin-bottom: 1rem; }
+.fg label { display: block; font-size: 12px; font-weight: 600; color: var(--ink2); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
+.fg input, .fg select, .fg textarea {
+  width: 100%; padding: 10px 13px; border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); font-family: 'Epilogue', sans-serif;
+  font-size: 14px; background: var(--surface); color: var(--ink);
+  transition: border-color .15s; outline: none;
+}
+.fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--accent); }
+.fg textarea { resize: vertical; min-height: 70px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+.hint { font-size: 11px; color: var(--ink3); margin-top: 4px; }
+.err-msg { font-size: 13px; color: var(--accent); margin-top: 6px; display: none; }
+
+/* CARDS */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); }
+.card-hdr { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--surface2); border-radius: var(--r-lg) var(--r-lg) 0 0; }
+.card-body { padding: 1.25rem; }
+
+/* BADGES */
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-amber { background: var(--amber-bg); color: var(--amber); }
+.badge-red { background: var(--red-bg); color: var(--red); }
+.badge-blue { background: var(--blue-bg); color: var(--blue); }
+.badge-gray { background: var(--surface2); color: var(--ink2); }
+
+/* OVERLAY / MODAL */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(24,22,15,.55); z-index: 300; align-items: center; justify-content: center; padding: 1rem; }
+.overlay.open { display: flex; }
+.modal { background: var(--surface); border-radius: var(--r-lg); width: 100%; max-width: 520px; max-height: 92vh; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); animation: slideUp .2s ease; }
+.modal-sm { max-width: 380px; }
+@keyframes slideUp { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:translateY(0) } }
+.modal-hdr { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.4rem; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.modal-body { padding: 1.4rem; overflow-y: auto; flex: 1; }
+.modal-ftr { padding: .9rem 1.4rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(8px); background: var(--ink); color: #fff; padding: .65rem 1.2rem; border-radius: var(--r-sm); font-size: 13px; z-index: 999; opacity: 0; transition: all .25s; pointer-events: none; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* TABLE */
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tbl th { text-align: left; font-size: 11px; font-weight: 600; color: var(--ink3); text-transform: uppercase; letter-spacing: .05em; padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+.tbl td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: var(--surface2); }
+
+/* AVATAR */
+.avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+.avatar-sm { width: 28px; height: 28px; font-size: 11px; }
+.avatar-lg { width: 52px; height: 52px; font-size: 20px; }
+
+/* COLOR SWATCHES */
+.swatches { display: flex; gap: 7px; flex-wrap: wrap; }
+.swatch { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2.5px solid transparent; transition: transform .1s; }
+.swatch:hover { transform: scale(1.15); }
+.swatch.sel { border-color: var(--ink); }
+
+/* CALENDAR */
+.cal-wrap { user-select: none; }
+.cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
+.cal-nav button { background: none; border: 1px solid var(--border); border-radius: var(--r-sm); padding: 5px 10px; cursor: pointer; font-size: 13px; color: var(--ink2); }
+.cal-nav button:hover { background: var(--surface2); }
+.cal-month { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 500; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-day-name { text-align: center; font-size: 11px; font-weight: 600; color: var(--ink3); padding: 4px 0; text-transform: uppercase; }
+.cal-day { text-align: center; padding: 6px 2px; font-size: 13px; border-radius: var(--r-sm); cursor: pointer; transition: all .1s; position: relative; min-height: 34px; display: flex; align-items: center; justify-content: center; }
+.cal-day:hover:not(.disabled):not(.empty) { background: var(--surface2); }
+.cal-day.today { font-weight: 700; color: var(--accent); }
+.cal-day.available { background: var(--green-bg); color: var(--green); }
+.cal-day.available:hover { background: #c8ecda; }
+.cal-day.unavailable { background: var(--red-bg); color: #ccc; cursor: not-allowed; text-decoration: line-through; }
+.cal-day.selected { background: var(--accent); color: #fff !important; }
+.cal-day.in-range { background: var(--accent-light); color: var(--accent); }
+.cal-day.disabled { color: var(--ink3); cursor: default; }
+.cal-day.empty { cursor: default; }
+.cal-day.booked { background: var(--amber-bg); color: var(--amber); }
+
+/* BOTTOM NAV (mobile) */
+.bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); z-index: 100; padding: 6px 0 max(6px, env(safe-area-inset-bottom)); }
+.bottom-nav-items { display: flex; justify-content: space-around; }
+.bnav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 12px; border-radius: var(--r-sm); cursor: pointer; border: none; background: none; color: var(--ink3); font-family: 'Epilogue', sans-serif; font-size: 10px; font-weight: 500; transition: color .15s; min-width: 60px; }
+.bnav-item .icon { font-size: 20px; }
+.bnav-item.active { color: var(--accent); }
+@media (max-width: 640px) { .bottom-nav { display: block; } body { padding-bottom: 70px; } }
+
+/* TOP NAV */
+.topnav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 1.25rem; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 200; }
+.logo { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 6px; text-decoration: none; color: var(--ink); }
+.logo em { color: var(--accent); font-style: italic; font-weight: 300; }
+.nav-links { display: flex; gap: 2px; }
+.nav-link { padding: 6px 13px; border-radius: var(--r-sm); border: none; background: none; font-family: 'Epilogue', sans-serif; font-size: 13px; font-weight: 500; color: var(--ink2); cursor: pointer; transition: all .15s; }
+.nav-link:hover { background: var(--surface2); color: var(--ink); }
+.nav-link.active { background: var(--ink); color: #fff; }
+@media (max-width: 640px) { .nav-links { display: none; } }
+
+/* PAGE */
+.page { display: none; max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem; animation: fadeIn .2s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(4px) } to { opacity:1; transform:translateY(0) } }
+.page-hdr { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.25rem; gap: 1rem; flex-wrap: wrap; }
+.page-hdr p { font-size: 13px; color: var(--ink2); margin-top: 2px; }
+
+/* GRID HELPERS */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+@media (max-width: 600px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+/* STAT CARDS */
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.1rem 1.25rem; }
+.stat-val { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 500; color: var(--ink); }
+.stat-lbl { font-size: 12px; color: var(--ink2); margin-top: 2px; }
+
+/* EMPTY STATE */
+.empty { text-align: center; padding: 3rem 1rem; color: var(--ink2); }
+.empty .ei { font-size: 40px; margin-bottom: .75rem; }
+.empty p { font-size: 13px; line-height: 1.6; max-width: 260px; margin: .4rem auto 1.1rem; }
+
+/* DIVIDER */
+.divider { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+.section-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink3); margin-bottom: .6rem; }
+
+/* AUTH PAGE */
+.auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; background: var(--bg); }
+.auth-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 2rem; width: 100%; max-width: 400px; box-shadow: var(--shadow-lg); }
+.auth-logo { text-align: center; margin-bottom: 1.5rem; }
+
+/* RESERVATION CARD */
+.res-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1rem 1.25rem; margin-bottom: .75rem; display: flex; align-items: flex-start; gap: 12px; }
+.res-card-body { flex: 1; min-width: 0; }
+.res-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+.res-meta { font-size: 12px; color: var(--ink2); line-height: 1.7; }
+.res-amount { font-family: 'Fraunces', serif; font-size: 20px; white-space: nowrap; }
+.res-actions { display: flex; gap: 6px; margin-top: 8px; }
+
+/* CHECKIN STRIP */
+.checkin-strip { background: var(--green-bg); border: 1px solid var(--green-border); border-radius: var(--r-sm); padding: .6rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: .6rem; font-size: 13px; }
+.checkout-strip { background: var(--amber-bg); border: 1px solid #e8c97a; border-radius: var(--r-sm); padding: .6rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: .6rem; font-size: 13px; }
+
+/* COST PREVIEW BOX */
+.cost-preview { background: var(--accent-light); border: 1px solid var(--accent-border); border-radius: var(--r-sm); padding: .9rem 1.1rem; margin-top: .75rem; }
+.cost-preview .total { font-family: 'Fraunces', serif; font-size: 26px; color: var(--accent); }
+.cost-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink2); padding: 3px 0; }
+
+/* SLIDER */
+.slider-row { display: flex; align-items: center; gap: 10px; }
+.slider-row input[type=range] { flex: 1; accent-color: var(--accent); }
+.slider-val { font-weight: 600; font-size: 14px; min-width: 44px; }
+
+/* FORMULA PREVIEW */
+.formula-box { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: .8rem 1rem; font-family: monospace; font-size: 12px; line-height: 1.8; color: var(--ink2); }
+.formula-box strong { color: var(--accent); }
+
+
+.breed-opt {
+  padding: 8px 13px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--ink);
+  transition: background .1s;
+}
+.breed-opt:hover { background: var(--accent-light); }
+.breed-opt strong { color: var(--accent); font-weight: 600; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════ AUTH SCREEN ═══════ -->
+<div id="auth-screen" class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo" style="justify-content:center;font-size:26px;">🐾 Paw<em>board</em></div>
+      <p style="font-size:13px;color:var(--ink2);margin-top:6px;text-align:center;">Dog Boarding Management</p>
+    </div>
+
+    <!-- PANEL A: LOGIN/REGISTER -->
+    <div id="panel-login">
+      <div id="auth-tabs" style="display:flex;gap:4px;margin-bottom:1.25rem;">
+        <button id="tab-login" class="btn btn-primary btn-sm" style="flex:1;" onclick="_pb_showAuthTab('login')">Login</button>
+        <button id="tab-register" class="btn btn-secondary btn-sm" style="flex:1;" onclick="_pb_showAuthTab('register')">Register</button>
+      </div>
+      <div id="auth-login">
+        <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="you@email.com"/></div>
+        <div class="fg"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••"/></div>
+        <div class="err-msg" id="login-err"></div>
+        <button class="btn btn-primary btn-block" style="margin-top:.5rem;" onclick="_pb_doLogin()" id="login-btn">Sign In</button>
+      </div>
+      <div id="auth-register" style="display:none;">
+        <div class="form-row">
+          <div class="fg"><label>First Name</label><input type="text" id="reg-first" placeholder="Jane"/></div>
+          <div class="fg"><label>Last Name</label><input type="text" id="reg-last" placeholder="Doe"/></div>
+        </div>
+        <div class="fg"><label>Email</label><input type="email" id="reg-email" placeholder="you@email.com"/></div>
+        <div class="fg"><label>Phone</label><input type="tel" id="reg-phone" placeholder="+1 555 000-0000"/></div>
+        <div class="fg"><label>Password</label><input type="password" id="reg-pass" placeholder="Min 6 characters"/></div>
+        <div class="fg"><label>Confirm Password</label><input type="password" id="reg-pass2" placeholder="Repeat password"/></div>
+        <div class="err-msg" id="reg-err"></div>
+        <button class="btn btn-primary btn-block" style="margin-top:.5rem;" onclick="_pb_doRegister()" id="reg-btn">Create Account</button>
+      </div>
+      <div id="auth-loading" style="display:none;text-align:center;padding:1rem;color:var(--ink2);font-size:13px;">Connecting to Firebase...</div>
+      <hr class="divider" style="margin:.9rem 0;"/>
+      <div style="text-align:center;">
+        <button onclick="_pb_showPanel('panel-firebase')" style="font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:inherit;text-decoration:underline;padding:4px 8px;">⚙️ Configure Firebase</button>
+        <span style="font-size:11px;color:var(--ink3);display:block;margin-top:2px;" id="fb-config-status"></span>
+      </div>
+    </div>
+
+    <!-- PANEL B: FIREBASE CONFIG -->
+    <div id="panel-firebase" style="display:none;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;">
+        <button onclick="_pb_showPanel('panel-login')" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--ink2);padding:0;line-height:1;">&#8592;</button>
+        <span style="font-size:15px;font-weight:600;">🔥 Firebase Config</span>
+      </div>
+      <div style="background:var(--amber-bg);border:1px solid #e8c97a;border-radius:var(--r-sm);padding:.65rem .9rem;font-size:12px;color:var(--amber);margin-bottom:.85rem;">
+        Paste your Firebase project config below. <a href="https://console.firebase.google.com" target="_blank" style="color:var(--amber);font-weight:600;">Open Console ↗</a>
+      </div>
+      <div class="fg"><label>API Key *</label><input type="text" id="auth-fb-apiKey" placeholder="AIzaSy…"/></div>
+      <div class="fg"><label>Project ID *</label><input type="text" id="auth-fb-projectId" placeholder="my-pawboard-12345"/></div>
+      <div class="fg"><label>Auth Domain</label><input type="text" id="auth-fb-authDomain" placeholder="my-pawboard.firebaseapp.com"/></div>
+      <div class="fg"><label>App ID</label><input type="text" id="auth-fb-appId" placeholder="1:123456789:web:abc…"/></div>
+      <div id="auth-fb-err" style="display:none;font-size:12px;color:var(--accent);margin-bottom:.6rem;padding:.4rem .6rem;background:var(--red-bg);border-radius:var(--r-sm);"></div>
+      <button class="btn btn-primary btn-block" onclick="_pb_saveAndConnect()" style="margin-bottom:.6rem;">🔌 Save &amp; Connect</button>
+      <button class="btn btn-secondary btn-block" onclick="_pb_showOfflineMode()" style="font-size:13px;">Continue in Demo Mode</button>
+      <button onclick="_pb_toggleSetupHelp()" style="font-size:11px;color:var(--ink3);background:none;border:none;cursor:pointer;font-family:inherit;text-decoration:underline;margin-top:.6rem;display:block;width:100%;text-align:center;">Show setup guide</button>
+      <div id="setup-help" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:.9rem;margin-top:.5rem;font-size:12px;color:var(--ink2);line-height:2;">
+        1. <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent);">console.firebase.google.com</a> &#8594; Add project<br/>
+        2. Click &lt;/&gt; Web icon &#8594; Register app &#8594; copy config<br/>
+        3. Build &#8594; Authentication &#8594; Enable Email/Password<br/>
+        4. Build &#8594; Firestore Database &#8594; Create in test mode<br/>
+        5. Paste the 4 values above and click Save &amp; Connect
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════ MAIN APP ═══════ -->
+<div id="app-screen" style="display:none;">
+
+  <!-- TOP NAV -->
+  <nav class="topnav">
+    <div class="logo">🐾 Paw<em>board</em></div>
+    <div class="nav-links" id="desktop-nav"></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div id="user-chip" style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink2);"></div>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Sign out</button>
+    </div>
+  </nav>
+
+  <!-- PAGES -->
+  <div id="pages">
+
+    <!-- ── USER: DASHBOARD ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-hdr"><div><h1>Welcome back!</h1><p id="dash-sub">Your boarding overview</p></div>
+        <button class="btn btn-primary" onclick="navTo('book')">＋ Book a Stay</button>
+      </div>
+      <div class="grid-3" style="margin-bottom:1.25rem;">
+        <div class="stat-card"><div class="stat-val" id="stat-dogs">0</div><div class="stat-lbl">My Dogs</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-upcoming">0</div><div class="stat-lbl">Upcoming Stays</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-spent">$0</div><div class="stat-lbl">Total Spent</div></div>
+      </div>
+      <h3 style="margin-bottom:.75rem;">Upcoming Reservations</h3>
+      <div id="upcoming-list"></div>
+    </div>
+
+    <!-- ── USER: MY DOGS ── -->
+    <div class="page" id="page-dogs">
+      <div class="page-hdr"><div><h1>My Dogs</h1><p>Manage your dogs' profiles</p></div>
+        <button class="btn btn-primary" onclick="openDogModal()">＋ Add Dog</button>
+      </div>
+      <div id="my-dogs-grid" class="grid-2" style="gap:.85rem;"></div>
+    </div>
+
+    <!-- ── USER: BOOK ── -->
+    <div class="page" id="page-book">
+      <div class="page-hdr"><div><h1>Book a Stay</h1><p>Select your dog, choose available dates</p></div></div>
+      <div class="grid-2" style="align-items:start;">
+        <div>
+          <div class="card" style="margin-bottom:1rem;">
+            <div class="card-hdr"><h3>1. Select Dog</h3></div>
+            <div class="card-body"><div id="book-dog-list"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-hdr"><h3>2. Pick Dates</h3></div>
+            <div class="card-body">
+              <div class="cal-wrap" id="book-cal"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:.75rem;font-size:11px;">
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:var(--green-bg);border-radius:3px;border:1px solid var(--green);display:inline-block;"></span>Available</span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:var(--red-bg);border-radius:3px;display:inline-block;"></span>Unavailable</span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:var(--amber-bg);border-radius:3px;display:inline-block;"></span>Booked</span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:var(--accent);border-radius:3px;display:inline-block;"></span>Selected</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:1rem;">
+            <div class="card-hdr"><h3>3. Times</h3></div>
+            <div class="card-body">
+              <div class="fg"><label>Drop-off Time</label><input type="time" id="book-droptime" value="09:00" oninput="recalcBooking()"/></div>
+              <div class="fg"><label>Pick-up Time</label><input type="time" id="book-picktime" value="09:00" oninput="recalcBooking()"/></div>
+              <div id="book-date-display" style="font-size:13px;color:var(--ink2);min-height:36px;"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hdr"><h3>Cost Estimate</h3></div>
+            <div class="card-body">
+              <div id="cost-preview"><p style="font-size:13px;color:var(--ink3);">Select a dog and dates to see cost.</p></div>
+              <div class="err-msg" id="book-err"></div>
+              <button class="btn btn-primary btn-block" style="margin-top:1rem;" onclick="confirmBooking()" id="book-confirm-btn" disabled>Confirm Booking</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── USER: MY RESERVATIONS ── -->
+    <div class="page" id="page-reservations">
+      <div class="page-hdr"><div><h1>My Reservations</h1><p>All your boarding history</p></div></div>
+      <div id="my-reservations-list"></div>
+    </div>
+
+    <!-- ── ADMIN: DASHBOARD ── -->
+    <div class="page" id="page-admin-dash">
+      <div class="page-hdr"><div><h1>Admin Dashboard</h1><p>Boarding operations overview</p></div></div>
+      <div class="grid-3" style="margin-bottom:1.25rem;">
+        <div class="stat-card"><div class="stat-val" id="adm-stat-dogs">0</div><div class="stat-lbl">Total Dogs</div></div>
+        <div class="stat-card"><div class="stat-val" id="adm-stat-checkedin">0</div><div class="stat-lbl">Currently Boarded</div></div>
+        <div class="stat-card"><div class="stat-val" id="adm-stat-revenue">$0</div><div class="stat-lbl">Total Revenue</div></div>
+      </div>
+      <div class="grid-2" style="align-items:start;">
+        <div>
+          <h3 style="margin-bottom:.75rem;">Today's Activity</h3>
+          <div id="admin-today-list"></div>
+        </div>
+        <div>
+          <h3 style="margin-bottom:.75rem;">Pending Check-ins</h3>
+          <div id="admin-checkin-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ADMIN: ALL RESERVATIONS ── -->
+    <div class="page" id="page-admin-reservations">
+      <div class="page-hdr"><div><h1>All Reservations</h1><p>Manage check-ins and check-outs</p></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <select id="res-filter" onchange="renderAdminReservations()" class="btn btn-secondary btn-sm" style="padding:6px 10px;">
+            <option value="all">All</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="checked_in">Checked In</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+      </div>
+      <div id="admin-res-table"></div>
+    </div>
+
+    <!-- ── ADMIN: AVAILABILITY CALENDAR ── -->
+    <div class="page" id="page-admin-calendar">
+      <div class="page-hdr"><div><h1>Availability Calendar</h1><p>Mark open and closed dates</p></div></div>
+      <div class="grid-2" style="align-items:start;">
+        <div class="card">
+          <div class="card-hdr"><h3>Manage Availability</h3></div>
+          <div class="card-body">
+            <div class="cal-wrap" id="admin-cal"></div>
+            <hr class="divider"/>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-success btn-sm" onclick="markDates('available')">✓ Mark Available</button>
+              <button class="btn btn-danger btn-sm" onclick="markDates('unavailable')">✗ Mark Unavailable</button>
+              <button class="btn btn-secondary btn-sm" onclick="clearSelection()">Clear</button>
+            </div>
+            <div style="margin-top:.75rem;font-size:12px;color:var(--ink3);">Click dates to select, then mark as available or unavailable.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><h3>Quick Actions</h3></div>
+          <div class="card-body">
+            <div class="fg"><label>Mark entire month</label>
+              <div style="display:flex;gap:6px;margin-top:4px;">
+                <button class="btn btn-success btn-sm" style="flex:1;" onclick="markMonth('available')">All Available</button>
+                <button class="btn btn-danger btn-sm" style="flex:1;" onclick="markMonth('unavailable')">All Unavailable</button>
+              </div>
+            </div>
+            <hr class="divider"/>
+            <div class="section-lbl">Availability Legend</div>
+            <div style="font-size:12px;color:var(--ink2);line-height:2;">
+              <div><span style="display:inline-block;width:12px;height:12px;background:var(--green-bg);border:1px solid var(--green);border-radius:2px;margin-right:6px;vertical-align:middle;"></span>Available for booking</div>
+              <div><span style="display:inline-block;width:12px;height:12px;background:var(--red-bg);border-radius:2px;margin-right:6px;vertical-align:middle;"></span>Closed / Unavailable</div>
+              <div><span style="display:inline-block;width:12px;height:12px;background:var(--amber-bg);border-radius:2px;margin-right:6px;vertical-align:middle;"></span>Already booked</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ADMIN: USERS ── -->
+    <div class="page" id="page-admin-users">
+      <div class="page-hdr"><div><h1>Users</h1><p>All registered customers</p></div></div>
+      <div id="admin-users-table"></div>
+    </div>
+
+    <!-- ── ADMIN: SETTINGS ── -->
+    <div class="page" id="page-admin-settings">
+      <div class="page-hdr"><div><h1>Settings</h1><p>Formula, custom fields, Firebase</p></div></div>
+      <div class="grid-2" style="align-items:start;">
+        <div class="card">
+          <div class="card-hdr"><h3>⚡ Pricing Formula</h3></div>
+          <div class="card-body">
+            <div class="fg">
+              <label>Default Daily Rate ($)</label>
+              <input type="number" id="set-default-rate" placeholder="50.00" step="0.01" min="0"/>
+              <div class="hint">Used if a dog has no specific rate set</div>
+            </div>
+            <div class="fg">
+              <label>Surcharge Threshold (hours past 24h)</label>
+              <div class="slider-row"><input type="range" min="0" max="12" step="0.5" id="set-threshold" oninput="updateFormulaUI()"/><span class="slider-val" id="set-threshold-val">3h</span></div>
+            </div>
+            <div class="fg">
+              <label>Surcharge Rate (%)</label>
+              <div class="slider-row"><input type="range" min="0" max="100" step="5" id="set-surcharge" oninput="updateFormulaUI()"/><span class="slider-val" id="set-surcharge-val">50%</span></div>
+            </div>
+            <div class="fg">
+              <label>Minimum Billable Days</label>
+              <div class="slider-row"><input type="range" min="1" max="5" step="1" id="set-mindays" oninput="updateFormulaUI()"/><span class="slider-val" id="set-mindays-val">1</span></div>
+            </div>
+            <div class="formula-box" id="formula-preview"></div>
+            <button class="btn btn-primary btn-sm" style="margin-top:.85rem;" onclick="saveSettings()">Save Formula</button>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:1rem;">
+            <div class="card-hdr"><h3>🗂 Custom Dog Fields</h3><button class="btn btn-secondary btn-xs" onclick="openFieldModal()">＋ Add</button></div>
+            <div class="card-body"><div id="field-defs-list"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-hdr"><h3>🔥 Firebase Config</h3><span class="badge" id="fb-badge">Not set</span></div>
+            <div class="card-body">
+              <div class="fg"><label>API Key</label><input type="text" id="fb-apiKey" placeholder="AIza…"/></div>
+              <div class="fg"><label>Project ID</label><input type="text" id="fb-projectId" placeholder="my-project"/></div>
+              <div class="fg"><label>Auth Domain</label><input type="text" id="fb-authDomain" placeholder="my-project.firebaseapp.com"/></div>
+              <div class="fg"><label>App ID</label><input type="text" id="fb-appId" placeholder="1:…"/></div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button class="btn btn-primary btn-sm" onclick="connectFirebase()">🔌 Connect</button>
+                <button class="btn btn-secondary btn-sm" onclick="disconnectFirebase()">Disconnect</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /pages -->
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav" id="bottom-nav"></nav>
+
+</div><!-- /app-screen -->
+
+<!-- DOG MODAL -->
+<div class="overlay" id="dog-modal">
+  <div class="modal">
+    <div class="modal-hdr"><h2 id="dog-modal-title">Add Dog</h2><button class="btn btn-ghost btn-sm" onclick="closeModal('dog-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label>Dog's Name *</label><input type="text" id="f-name" placeholder="Buddy"/></div>
+      <div class="form-row">
+        <div class="fg" style="position:relative;">
+          <label>Breed</label>
+          <input type="text" id="f-breed" placeholder="Search breed…" autocomplete="off"
+            oninput="filterBreeds()" onfocus="showBreedList()" onblur="hideBreedList()"
+            style="width:100%;"/>
+          <div id="breed-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1.5px solid var(--accent);border-top:none;border-radius:0 0 var(--r-sm) var(--r-sm);max-height:180px;overflow-y:auto;z-index:500;box-shadow:var(--shadow);"></div>
+        </div>
+        <div class="fg"><label>Size</label><select id="f-size"><option value="">— select —</option><option>Small (&lt;10kg)</option><option>Medium (10–25kg)</option><option>Large (25kg+)</option></select></div>
+      </div>
+      <div class="fg"><label>Custom Daily Rate ($) <span style="font-weight:400;text-transform:none;">(optional — uses default if blank)</span></label><input type="number" id="f-rate" placeholder="Leave blank for default" min="0" step="0.01"/></div>
+      <div class="fg"><label>Notes / Special Care</label><textarea id="f-notes" placeholder="Medications, diet, allergies…"></textarea></div>
+      <div class="fg"><label>Profile Color</label><div class="swatches" id="dog-color-swatches"></div></div>
+      <div id="dog-custom-fields"></div>
+      <div class="err-msg" id="dog-err"></div>
+    </div>
+    <div class="modal-ftr"><button class="btn btn-secondary" onclick="closeModal('dog-modal')">Cancel</button><button class="btn btn-primary" onclick="saveDog()">Save Dog</button></div>
+  </div>
+</div>
+
+<!-- FIELD MODAL -->
+<div class="overlay" id="field-modal">
+  <div class="modal modal-sm">
+    <div class="modal-hdr"><h2>Custom Field</h2><button class="btn btn-ghost btn-sm" onclick="closeModal('field-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label>Label *</label><input type="text" id="ff-label" placeholder="e.g. Vaccination Date"/></div>
+      <div class="fg"><label>Type</label><select id="ff-type" onchange="renderFieldTypeOpts()"><option value="text">Text</option><option value="number">Number</option><option value="date">Date</option><option value="toggle">Yes / No</option><option value="dropdown">Dropdown</option></select></div>
+      <div id="ff-extra"></div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="ff-required"/> Required</label>
+      <div class="err-msg" id="ff-err"></div>
+    </div>
+    <div class="modal-ftr"><button class="btn btn-secondary" onclick="closeModal('field-modal')">Cancel</button><button class="btn btn-primary" onclick="saveFieldDef()">Save</button></div>
+  </div>
+</div>
+
+<!-- BOOKING CONFIRM MODAL -->
+<div class="overlay" id="confirm-modal">
+  <div class="modal modal-sm">
+    <div class="modal-hdr"><h2>Confirm Booking</h2><button class="btn btn-ghost btn-sm" onclick="closeModal('confirm-modal')">✕</button></div>
+    <div class="modal-body" id="confirm-modal-body"></div>
+    <div class="modal-ftr"><button class="btn btn-secondary" onclick="closeModal('confirm-modal')">Cancel</button><button class="btn btn-primary" onclick="submitBooking()" id="submit-book-btn">Confirm &amp; Book</button></div>
+  </div>
+</div>
+
+<!-- ADMIN VIEW RESERVATION MODAL -->
+<div class="overlay" id="res-detail-modal">
+  <div class="modal">
+    <div class="modal-hdr"><h2>Reservation Detail</h2><button class="btn btn-ghost btn-sm" onclick="closeModal('res-detail-modal')">✕</button></div>
+    <div class="modal-body" id="res-detail-body"></div>
+    <div class="modal-ftr" id="res-detail-ftr"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDKs -->
+<script>
+// === Global shims — defined first so onclick attributes always resolve ===
+function _pb_showPanel(id)        { var ps=['panel-login','panel-firebase']; ps.forEach(function(p){var el=document.getElementById(p);if(el)el.style.display=p===id?'block':'none';}); }
+function _pb_showFirebasePanel()  { _pb_showPanel('panel-firebase'); }
+function _pb_saveAndConnect()     { if(typeof saveAndConnectFirebase==='function') saveAndConnectFirebase(); }
+function _pb_showOfflineMode()    { if(typeof showOfflineMode==='function')    showOfflineMode();    }
+function _pb_toggleSetupHelp()    { if(typeof toggleSetupHelp==='function')    toggleSetupHelp();    }
+function _pb_doLogin()            { if(typeof doLogin==='function')            doLogin();            }
+function _pb_doRegister()         { if(typeof doRegister==='function')         doRegister();         }
+function _pb_showAuthTab(t)       { if(typeof showAuthTab==='function')        showAuthTab(t);       }
+</script>
+<script>
+// === Firebase REST Layer ===
+// ═══════════════════════════════════════════════════════════
+//  FIREBASE REST LAYER — replaces SDK with pure fetch() calls
+//  Works from any browser, local file, or hosted server.
+//  Uses:
+//    Firebase Auth REST API
+//    Firestore REST API
+// ═══════════════════════════════════════════════════════════
+
+var FB = {
+  apiKey: null,
+  projectId: null,
+  authDomain: null,
+  idToken: null,
+  refreshToken: null,
+  tokenExpiry: 0,
+  _authListeners: [],
+  _firestoreListeners: {},   // docPath -> {intervalId, lastData}
+
+  // ── CONFIGURE ──
+  init: function(cfg) {
+    this.apiKey    = cfg.apiKey;
+    this.projectId = cfg.projectId;
+    this.authDomain= cfg.authDomain || cfg.projectId + '.firebaseapp.com';
+    // Restore session
+    var sess = FB._lsGet('fb_session');
+    if (sess) {
+      FB.idToken     = sess.idToken;
+      FB.refreshToken= sess.refreshToken;
+      FB.tokenExpiry = sess.tokenExpiry;
+      FB.uid         = sess.uid;
+      FB.email       = sess.email;
+    }
+    return this;
+  },
+
+  _lsGet: function(k) { try { return JSON.parse(localStorage.getItem(k)||'null'); } catch(e) { return null; } },
+  _lsSet: function(k,v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} },
+  _lsDel: function(k)   { try { localStorage.removeItem(k); } catch(e) {} },
+
+  // ── AUTH BASE URL ──
+  _authUrl: function(action) {
+    return 'https://identitytoolkit.googleapis.com/v1/accounts:' + action + '?key=' + FB.apiKey;
+  },
+
+  // ── FIRESTORE BASE URL ──
+  _fsUrl: function(path) {
+    return 'https://firestore.googleapis.com/v1/projects/' + FB.projectId + '/databases/(default)/documents/' + path;
+  },
+
+  // ── GET VALID TOKEN (refresh if expired) ──
+  _getToken: async function() {
+    if (!FB.idToken) return null;
+    if (Date.now() < FB.tokenExpiry - 60000) return FB.idToken;
+    // refresh
+    try {
+      var r = await fetch('https://securetoken.googleapis.com/v1/token?key=' + FB.apiKey, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ grant_type: 'refresh_token', refresh_token: FB.refreshToken })
+      });
+      var d = await r.json();
+      if (d.id_token) {
+        FB.idToken      = d.id_token;
+        FB.refreshToken = d.refresh_token;
+        FB.tokenExpiry  = Date.now() + (parseInt(d.expires_in)||3600) * 1000;
+        FB._saveSession();
+        return FB.idToken;
+      }
+    } catch(e) { console.warn('Token refresh failed', e); }
+    return FB.idToken;
+  },
+
+  _saveSession: function() {
+    FB._lsSet('fb_session', { idToken: FB.idToken, refreshToken: FB.refreshToken, tokenExpiry: FB.tokenExpiry, uid: FB.uid, email: FB.email });
+  },
+
+  _notifyAuthListeners: function(user) {
+    FB._authListeners.forEach(function(fn) { try { fn(user); } catch(e) {} });
+  },
+
+  // ── AUTH: SIGN UP ──
+  signUp: async function(email, password) {
+    var r = await fetch(FB._authUrl('signUp'), {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email: email, password: password, returnSecureToken: true })
+    });
+    var d = await r.json();
+    if (d.error) throw new Error(FB._friendlyError(d.error.message));
+    FB._storeAuthResult(d);
+    return { uid: d.localId, email: d.email };
+  },
+
+  // ── AUTH: SIGN IN ──
+  signIn: async function(email, password) {
+    var r = await fetch(FB._authUrl('signInWithPassword'), {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email: email, password: password, returnSecureToken: true })
+    });
+    var d = await r.json();
+    if (d.error) throw new Error(FB._friendlyError(d.error.message));
+    FB._storeAuthResult(d);
+    return { uid: d.localId, email: d.email };
+  },
+
+  // ── AUTH: SIGN OUT ──
+  signOut: function() {
+    FB.idToken = null; FB.refreshToken = null; FB.tokenExpiry = 0; FB.uid = null; FB.email = null;
+    FB._lsDel('fb_session');
+    FB._notifyAuthListeners(null);
+  },
+
+  // ── AUTH STATE OBSERVER ──
+  onAuthStateChanged: function(callback) {
+    FB._authListeners.push(callback);
+    // Fire immediately with current state
+    if (FB.idToken && FB.uid) {
+      setTimeout(function() { callback({ uid: FB.uid, email: FB.email }); }, 0);
+    } else {
+      setTimeout(function() { callback(null); }, 0);
+    }
+    return function() { FB._authListeners = FB._authListeners.filter(function(f) { return f !== callback; }); };
+  },
+
+  _storeAuthResult: function(d) {
+    FB.idToken      = d.idToken;
+    FB.refreshToken = d.refreshToken;
+    FB.tokenExpiry  = Date.now() + (parseInt(d.expiresIn)||3600) * 1000;
+    FB.uid          = d.localId;
+    FB.email        = d.email;
+    FB._saveSession();
+    FB._notifyAuthListeners({ uid: d.localId, email: d.email });
+  },
+
+  _friendlyError: function(msg) {
+    if(!msg) return 'Unknown error. Please try again.';
+    // REST API returns full strings like "WEAK_PASSWORD : Password should be at least 6 characters"
+    // Normalize by taking the part before any colon/space
+    var code = msg.split(' ')[0].split(':')[0].trim();
+    var m = {
+      'EMAIL_NOT_FOUND':            'No account found with that email address.',
+      'INVALID_PASSWORD':           'Incorrect password. Please try again.',
+      'INVALID_LOGIN_CREDENTIALS':  'Incorrect email or password.',
+      'INVALID_EMAIL':              'Please enter a valid email address.',
+      'EMAIL_EXISTS':               'An account with this email already exists.',
+      'WEAK_PASSWORD':              'Password must be at least 6 characters.',
+      'TOO_MANY_ATTEMPTS_TRY_LATER':'Too many failed attempts. Please try again later.',
+      'USER_DISABLED':              'This account has been disabled.',
+      'MISSING_PASSWORD':           'Please enter a password.',
+      'MISSING_EMAIL':              'Please enter your email address.',
+      'USER_NOT_FOUND':             'No account found with that email address.',
+      'OPERATION_NOT_ALLOWED':      'Email/password sign-in is not enabled. Please enable it in Firebase Console under Authentication.',
+      'CONFIGURATION_NOT_FOUND':    'Firebase project not found. Please check your Project ID.',
+      'API_KEY_INVALID':            'Invalid API Key. Please check your Firebase config.',
+    };
+    // Try full message first, then normalized code
+    return m[msg] || m[code] || msg;
+  },
+
+  // ═══════════════════ FIRESTORE REST ═══════════════════
+
+  // Convert Firestore REST value to JS
+  _fromFsValue: function(val) {
+    if (val === undefined || val === null) return null;
+    if (val.stringValue  !== undefined) return val.stringValue;
+    if (val.integerValue  !== undefined) return parseInt(val.integerValue);
+    if (val.doubleValue   !== undefined) return parseFloat(val.doubleValue);
+    if (val.booleanValue  !== undefined) return val.booleanValue;
+    if (val.nullValue     !== undefined) return null;
+    if (val.timestampValue!== undefined) return new Date(val.timestampValue).getTime();
+    if (val.arrayValue    !== undefined) return (val.arrayValue.values||[]).map(FB._fromFsValue);
+    if (val.mapValue      !== undefined) return FB._fromFsFields(val.mapValue.fields||{});
+    return null;
+  },
+
+  // Convert Firestore REST fields map to JS object
+  _fromFsFields: function(fields) {
+    var obj = {};
+    Object.keys(fields).forEach(function(k) { obj[k] = FB._fromFsValue(fields[k]); });
+    return obj;
+  },
+
+  // Convert JS value to Firestore REST value
+  _toFsValue: function(val) {
+    if (val === null || val === undefined) return { nullValue: null };
+    if (typeof val === 'boolean') return { booleanValue: val };
+    if (typeof val === 'number') {
+      if (Number.isInteger(val)) return { integerValue: String(val) };
+      return { doubleValue: val };
+    }
+    if (typeof val === 'string') return { stringValue: val };
+    if (Array.isArray(val)) return { arrayValue: { values: val.map(FB._toFsValue) } };
+    if (typeof val === 'object') {
+      var fields = {};
+      Object.keys(val).forEach(function(k) { fields[k] = FB._toFsValue(val[k]); });
+      return { mapValue: { fields: fields } };
+    }
+    return { stringValue: String(val) };
+  },
+
+  // Convert JS object to Firestore REST fields
+  _toFsFields: function(obj) {
+    var fields = {};
+    Object.keys(obj).forEach(function(k) { fields[k] = FB._toFsValue(obj[k]); });
+    return fields;
+  },
+
+  // ── GET a document ──
+  getDoc: async function(col, docId) {
+    var token = await FB._getToken();
+    var r = await fetch(FB._fsUrl(col + '/' + docId), {
+      headers: token ? { Authorization: 'Bearer ' + token } : {}
+    });
+    if (r.status === 404) return null;
+    var d = await r.json();
+    if (d.error) throw new Error(d.error.message);
+    if (!d.fields) return null;
+    return FB._fromFsFields(d.fields);
+  },
+
+  // ── GET all docs in a collection ──
+  getDocs: async function(col, filters) {
+    var token = await FB._getToken();
+    // Build structured query for filters
+    if (filters && filters.length) {
+      var body = {
+        structuredQuery: {
+          from: [{ collectionId: col }],
+          where: filters.length === 1 ? {
+            fieldFilter: {
+              field: { fieldPath: filters[0].field },
+              op: filters[0].op || 'EQUAL',
+              value: FB._toFsValue(filters[0].value)
+            }
+          } : {
+            compositeFilter: {
+              op: 'AND',
+              filters: filters.map(function(f) {
+                return { fieldFilter: { field: { fieldPath: f.field }, op: f.op || 'EQUAL', value: FB._toFsValue(f.value) } };
+              })
+            }
+          }
+        }
+      };
+      var r = await fetch(
+        'https://firestore.googleapis.com/v1/projects/' + FB.projectId + '/databases/(default)/documents:runQuery',
+        { method: 'POST', headers: Object.assign({'Content-Type':'application/json'}, token?{Authorization:'Bearer '+token}:{}), body: JSON.stringify(body) }
+      );
+      var arr = await r.json();
+      return (arr||[]).filter(function(item){ return item.document; }).map(function(item) {
+        var parts = item.document.name.split('/');
+        return Object.assign({ id: parts[parts.length-1] }, FB._fromFsFields(item.document.fields||{}));
+      });
+    }
+    // No filters — list all
+    var r = await fetch(FB._fsUrl(col), {
+      headers: token ? { Authorization: 'Bearer ' + token } : {}
+    });
+    var d = await r.json();
+    if (d.error) throw new Error(d.error.message);
+    return (d.documents||[]).map(function(doc) {
+      var parts = doc.name.split('/');
+      return Object.assign({ id: parts[parts.length-1] }, FB._fromFsFields(doc.fields||{}));
+    });
+  },
+
+  // ── SET a document (create or overwrite) ──
+  setDoc: async function(col, docId, data) {
+    var token = await FB._getToken();
+    var body = { fields: FB._toFsFields(data) };
+    var r = await fetch(FB._fsUrl(col + '/' + docId) + '?currentDocument.exists=false', {
+      method: 'PATCH', headers: Object.assign({'Content-Type':'application/json'}, token?{Authorization:'Bearer '+token}:{}), body: JSON.stringify(body)
+    });
+    // If exists, patch without condition
+    if (r.status === 412 || r.status === 400) {
+      r = await fetch(FB._fsUrl(col + '/' + docId), {
+        method: 'PATCH', headers: Object.assign({'Content-Type':'application/json'}, token?{Authorization:'Bearer '+token}:{}), body: JSON.stringify(body)
+      });
+    }
+    var d = await r.json();
+    if (d.error) throw new Error(d.error.message);
+    return docId;
+  },
+
+  // ── ADD a document (auto-id) ──
+  addDoc: async function(col, data) {
+    var token = await FB._getToken();
+    var r = await fetch(FB._fsUrl(col), {
+      method: 'POST', headers: Object.assign({'Content-Type':'application/json'}, token?{Authorization:'Bearer '+token}:{}),
+      body: JSON.stringify({ fields: FB._toFsFields(data) })
+    });
+    var d = await r.json();
+    if (d.error) throw new Error(d.error.message);
+    var parts = d.name.split('/');
+    return parts[parts.length-1];
+  },
+
+  // ── UPDATE specific fields ──
+  updateDoc: async function(col, docId, data) {
+    var token = await FB._getToken();
+    var fields = FB._toFsFields(data);
+    var mask = 'updateMask.fieldPaths=' + Object.keys(data).join('&updateMask.fieldPaths=');
+    var r = await fetch(FB._fsUrl(col + '/' + docId) + '?' + mask, {
+      method: 'PATCH', headers: Object.assign({'Content-Type':'application/json'}, token?{Authorization:'Bearer '+token}:{}),
+      body: JSON.stringify({ fields: fields })
+    });
+    var d = await r.json();
+    if (d.error) throw new Error(d.error.message);
+  },
+
+  // ── DELETE a document ──
+  deleteDoc: async function(col, docId) {
+    var token = await FB._getToken();
+    var r = await fetch(FB._fsUrl(col + '/' + docId), {
+      method: 'DELETE', headers: token ? { Authorization: 'Bearer ' + token } : {}
+    });
+    if (!r.ok && r.status !== 404) {
+      var d = await r.json();
+      if (d.error) throw new Error(d.error.message);
+    }
+  },
+
+  // ── POLL-BASED onSnapshot (refreshes every 5s) ──
+  onSnapshot: function(col, filters, callback) {
+    if (typeof filters === 'function') { callback = filters; filters = null; }
+    var key = col + JSON.stringify(filters||'');
+    var lastJson = null;
+    async function poll() {
+      try {
+        var docs = await FB.getDocs(col, filters);
+        var json = JSON.stringify(docs);
+        if (json !== lastJson) { lastJson = json; callback(docs); }
+      } catch(e) { console.warn('onSnapshot poll error:', e); }
+    }
+    poll();
+    var id = setInterval(poll, 5000);
+    FB._firestoreListeners[key] = id;
+    return function() { clearInterval(id); delete FB._firestoreListeners[key]; };
+  },
+
+  // ── BATCH set multiple docs ──
+  batchSet: async function(writes) {
+    // writes: [{col, id, data}]
+    for (var i = 0; i < writes.length; i++) {
+      await FB.setDoc(writes[i].col, writes[i].id, writes[i].data);
+    }
+  },
+
+  // ── VALIDATE CONFIG by pinging Firestore ──
+  validateConfig: async function() {
+    try {
+      var r = await fetch(FB._fsUrl('settings/global'), {
+        headers: {}
+      });
+      // 400/403 means Firestore exists but rules apply — that's fine
+      // 404 means doc doesn't exist — that's fine too
+      // network error means wrong projectId
+      return r.status !== 0;
+    } catch(e) {
+      return false;
+    }
+  }
+};
+
+
+// === Pawboard App ===
+// ═══════════════════════════════════════════════
+//  PAWBOARD — app.js
+// ═══════════════════════════════════════════════
+
+// ── COLORS & CONSTANTS ──
+var COLORS=[
+  {bg:'#FDE8CF',tx:'#78350F'},{bg:'#D1FAE5',tx:'#064E3B'},{bg:'#DBEAFE',tx:'#1E3A8A'},
+  {bg:'#FCE7F3',tx:'#831843'},{bg:'#EDE9FE',tx:'#4C1D95'},{bg:'#FEE2E2',tx:'#7F1D1D'},
+  {bg:'#CCFBF1',tx:'#134E4A'},{bg:'#FEF9C3',tx:'#713F12'}
+];
+var ADMIN_EMAIL = 'admin@pawboard.com'; // change to your admin email
+
+// ── STATE ──
+var fbApp=null, fbAuth=null, fbDb=null;
+var currentUser=null, currentUserData=null, isAdmin=false;
+var myDogs=[], allDogs=[], allUsers=[], allReservations=[], myReservations=[];
+var availability={}, bookingCache={};
+var settings={ threshold:3, surchargePct:50, minDays:1, defaultRate:50 };
+var fieldDefs=[];
+var calState={ year:new Date().getFullYear(), month:new Date().getMonth() };
+var adminCalState={ year:new Date().getFullYear(), month:new Date().getMonth() };
+var selectedCalDates=[], bookDropDate=null, bookPickDate=null;
+var editDogId=null, editFieldId=null, selColor=COLORS[0];
+var pendingBooking=null;
+var unsubFns=[];
+
+// ── LOCAL STORAGE ──
+var LS='pb2_';
+function lsGet(k){try{return JSON.parse(localStorage.getItem(LS+k)||'null');}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(LS+k,JSON.stringify(v));}catch(e){}}
+
+// ── UTILS ──
+function initials(n){return(n||'?').trim().split(/\s+/).slice(0,2).map(function(w){return w[0].toUpperCase();}).join('');}
+function esc(s){var d=document.createElement('div');d.textContent=String(s||'');return d.innerHTML;}
+function pad(n){return String(n).padStart(2,'0');}
+function fmtDate(d){if(!d)return'—';var dt=new Date(d);return dt.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});}
+function fmtDateTime(d){if(!d)return'—';var dt=new Date(d);return dt.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' '+dt.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});}
+function dateKey(y,m,d){return y+'-'+pad(m+1)+'-'+pad(d);}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2800);}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function openModal(id){document.getElementById(id).classList.add('open');}
+
+// ── FIREBASE INIT ──
+(function init(){
+  var cfg=lsGet('fbConfig');
+  settings=lsGet('settings')||settings;
+  fieldDefs=lsGet('fieldDefs')||[];
+  if(cfg&&cfg.apiKey){
+    try{
+      // Reuse existing Firebase app if already initialized
+      FB.init(cfg);
+      fbDb=true;
+      var loadEl=document.getElementById('auth-loading');
+      if(loadEl) loadEl.style.display='block';
+      _pb_showPanel('panel-login');
+      var loginEl=document.getElementById('auth-login');
+      if(loginEl) loginEl.style.display='block';
+      FB.onAuthStateChanged(onAuthChanged);
+    }catch(e){console.error('Firebase init error:',e);showFbNotConfigured();}
+  } else {
+    showFbNotConfigured();
+  }
+})();
+
+function showFbNotConfigured(){
+  var el=document.getElementById('auth-loading');
+  if(el) el.style.display='none';
+  _pb_showPanel('panel-firebase');
+}
+
+function showFirebasePanel(){
+  _pb_showPanel('panel-firebase');
+  var cfg=lsGet('fbConfig');
+  if(cfg){
+    document.getElementById('auth-fb-apiKey').value=cfg.apiKey||'';
+    document.getElementById('auth-fb-projectId').value=cfg.projectId||'';
+    document.getElementById('auth-fb-authDomain').value=cfg.authDomain||'';
+    document.getElementById('auth-fb-appId').value=cfg.appId||'';
+  }
+}
+
+function toggleSetupHelp(){
+  var el=document.getElementById('setup-help');
+  el.style.display=el.style.display==='none'?'block':'none';
+}
+
+function saveAndConnectFirebase(){
+  var apiKey    = (document.getElementById('auth-fb-apiKey')     ||{}).value||'';
+  var projectId = (document.getElementById('auth-fb-projectId')  ||{}).value||'';
+  var authDomain= (document.getElementById('auth-fb-authDomain') ||{}).value||'';
+  var appId     = (document.getElementById('auth-fb-appId')      ||{}).value||'';
+  apiKey=apiKey.trim(); projectId=projectId.trim();
+  authDomain=authDomain.trim(); appId=appId.trim();
+
+  var errEl = document.getElementById('auth-fb-err');
+  if(errEl) errEl.style.display='none';
+
+  if(!apiKey||!projectId){
+    if(errEl){errEl.textContent='API Key and Project ID are required.';errEl.style.display='block';}
+    return;
+  }
+  if(!authDomain) authDomain=projectId+'.firebaseapp.com';
+
+  var cfg={apiKey:apiKey,projectId:projectId,authDomain:authDomain,appId:appId};
+  lsSet('fbConfig',cfg);
+
+  try{
+    FB.init(cfg);
+    fbDb=true;
+    FB.onAuthStateChanged(onAuthChanged);
+    _pb_showPanel('panel-login');
+    toast('Firebase connected! Register or log in below.');
+  }catch(e){
+    if(errEl){errEl.textContent='Connection failed: '+e.message;errEl.style.display='block';}
+    else{ toast('Connection failed: '+e.message); }
+  }
+}
+
+function showOfflineMode(){
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('app-screen').style.display='block';
+  currentUser={uid:'demo',email:'demo@demo.com'};
+  currentUserData={firstName:'Demo',lastName:'User',email:'demo@demo.com',role:'user'};
+  isAdmin=false;
+  buildNav();
+  navTo('dashboard');
+  toast('Running in demo mode (no Firebase)');
+}
+
+function onAuthChanged(user){
+  document.getElementById('auth-loading').style.display='none';
+  if(user){
+    currentUser={uid:user.uid,email:user.email};
+    loadUserData(user.uid);
+  } else {
+    currentUser=null;currentUserData=null;isAdmin=false;
+    document.getElementById('auth-screen').style.display='flex';
+    document.getElementById('app-screen').style.display='none';
+    _pb_showPanel('panel-login');
+    document.getElementById('auth-login').style.display='block';
+    document.getElementById('auth-register').style.display='none';
+    // Show Firebase project name
+    var cfg=lsGet('fbConfig');
+    var statusEl=document.getElementById('fb-config-status');
+    if(statusEl){
+      statusEl.textContent=cfg&&cfg.projectId?'Connected: '+cfg.projectId:'Not connected';
+      statusEl.style.color=cfg&&cfg.projectId?'var(--green)':'var(--accent)';
+    }
+  }
+}
+
+async function loadUserData(uid){
+  try{
+    var userData=await FB.getDoc('users',uid);
+    if(userData){
+      currentUserData=Object.assign({id:uid},userData);
+      isAdmin=currentUserData.role==='admin';
+    } else {
+      currentUserData={id:uid,email:currentUser.email,firstName:'User',role:'user'};
+      isAdmin=false;
+    }
+    await loadGlobalSettings();
+    document.getElementById('auth-screen').style.display='none';
+    document.getElementById('app-screen').style.display='block';
+    buildNav();
+    subscribeData();
+    navTo(isAdmin?'admin-dash':'dashboard');
+  }catch(e){console.error(e);toast('Error loading profile: '+e.message);}
+}
+
+async function loadGlobalSettings(){
+  if(!fbDb)return;
+  try{
+    var snap=await FB.getDoc('settings','global');
+    if(snap) Object.assign(settings,snap);
+    var fd=await FB.getDoc('settings','fieldDefs');
+    if(fd) fieldDefs=fd.defs||[];
+    var avDocs=await FB.getDocs('availability');
+    avDocs.forEach(function(d){availability[d.id]=d.status;});
+    lsSet('settings',settings);lsSet('fieldDefs',fieldDefs);
+  }catch(e){console.warn('Settings load:',e);}
+}
+
+// ── SUBSCRIPTIONS ──
+function subscribeData(){
+  unsubFns.forEach(function(u){try{u();}catch(e){}});
+  unsubFns=[];
+  if(!fbDb)return;
+  if(isAdmin){
+    unsubFns.push(FB.onSnapshot('dogs',null,function(docs){allDogs=docs;renderAdminDash();}));
+    unsubFns.push(FB.onSnapshot('users',null,function(docs){allUsers=docs;renderAdminUsers();}));
+    unsubFns.push(FB.onSnapshot('reservations',null,function(docs){
+      allReservations=docs.sort(function(a,b){return b.createdAt-a.createdAt;});
+      renderAdminReservations();renderAdminDash();
+    }));
+  } else {
+    unsubFns.push(FB.onSnapshot('dogs',[{field:'userId',value:currentUser.uid}],function(docs){myDogs=docs;renderMyDogs();renderDashboard();renderBookDogs();}));
+    unsubFns.push(FB.onSnapshot('reservations',[{field:'userId',value:currentUser.uid}],function(docs){
+      myReservations=docs.sort(function(a,b){return b.createdAt-a.createdAt;});
+      renderMyReservations();renderDashboard();
+    }));
+  }
+}
+
+// ── AUTH FORMS ──
+function showAuthTab(t){
+  document.getElementById('auth-login').style.display=t==='login'?'block':'none';
+  document.getElementById('auth-register').style.display=t==='register'?'block':'none';
+  document.getElementById('tab-login').className='btn btn-sm '+(t==='login'?'btn-primary':'btn-secondary');
+  document.getElementById('tab-register').className='btn btn-sm '+(t==='register'?'btn-primary':'btn-secondary');
+  document.getElementById('tab-login').style.flex='1';document.getElementById('tab-register').style.flex='1';
+}
+
+async function doLogin(){
+  if(!fbDb){toast('Firebase not connected');return;}
+  var email=document.getElementById('login-email').value.trim();
+  var pass=document.getElementById('login-pass').value;
+  var err=document.getElementById('login-err');
+  err.style.display='none';
+  if(!email||!pass){err.textContent='Enter email and password.';err.style.display='block';return;}
+  document.getElementById('login-btn').disabled=true;document.getElementById('login-btn').textContent='Signing in…';
+  try{await FB.signIn(email,pass);}
+  catch(e){
+    err.textContent=e.message||'Sign in failed. Please try again.';
+    err.style.display='block';
+  }
+  finally{document.getElementById('login-btn').disabled=false;document.getElementById('login-btn').textContent='Sign In';}
+}
+
+async function doRegister(){
+  if(!fbDb){toast('Firebase not connected');return;}
+  var first=document.getElementById('reg-first').value.trim();
+  var last=document.getElementById('reg-last').value.trim();
+  var email=document.getElementById('reg-email').value.trim();
+  var phone=document.getElementById('reg-phone').value.trim();
+  var pass=document.getElementById('reg-pass').value;
+  var pass2=document.getElementById('reg-pass2').value;
+  var err=document.getElementById('reg-err');err.style.display='none';
+  if(!first||!email||!pass){err.textContent='Fill in all required fields.';err.style.display='block';return;}
+  if(pass!==pass2){err.textContent='Passwords do not match.';err.style.display='block';return;}
+  if(pass.length<6){err.textContent='Password must be at least 6 characters.';err.style.display='block';return;}
+  document.getElementById('reg-btn').disabled=true;document.getElementById('reg-btn').textContent='Creating account…';
+  try{
+    var cred=await FB.signUp(email,pass);
+    var userData={firstName:first,lastName:last,email:email,phone:phone,role:'user',createdAt:Date.now()};
+    await FB.setDoc('users',cred.uid,userData);
+    toast('Welcome to Pawboard!');
+  }catch(e){
+    // e.message is already human-readable from FB._friendlyError
+    err.textContent=e.message||'Registration failed. Please try again.';
+    err.style.display='block';
+  }
+  finally{document.getElementById('reg-btn').disabled=false;document.getElementById('reg-btn').textContent='Create Account';}
+}
+
+function friendlyAuthError(code){
+  // This receives the message from FB._friendlyError which is already human-readable
+  // Just pass it through - it's already been translated
+  return code||'Authentication error. Please try again.';
+}
+
+async function doLogout(){
+  unsubFns.forEach(function(u){try{u();}catch(e){}});unsubFns=[];
+  FB.signOut();
+}
+
+// ── NAV ──
+var USER_NAV=[
+  {id:'dashboard',label:'Home',icon:'🏠'},
+  {id:'dogs',label:'My Dogs',icon:'🐶'},
+  {id:'book',label:'Book',icon:'📅'},
+  {id:'reservations',label:'History',icon:'📋'}
+];
+var ADMIN_NAV=[
+  {id:'admin-dash',label:'Dashboard',icon:'📊'},
+  {id:'admin-reservations',label:'Reservations',icon:'📋'},
+  {id:'admin-calendar',label:'Calendar',icon:'📅'},
+  {id:'admin-users',label:'Users',icon:'👥'},
+  {id:'admin-settings',label:'Settings',icon:'⚙️'}
+];
+
+function buildNav(){
+  var nav=isAdmin?ADMIN_NAV:USER_NAV;
+  var chip=document.getElementById('user-chip');
+  var name=currentUserData?(currentUserData.firstName||currentUserData.email):'';
+  chip.innerHTML='<div class="avatar avatar-sm" style="background:#EDE9FE;color:#4C1D95;">'+initials(name)+'</div><span style="display:none;" class="show-desktop">'+esc(name)+'</span>'+(isAdmin?'<span class="badge badge-amber" style="margin-left:2px;">Admin</span>':'');
+  var dn=document.getElementById('desktop-nav');
+  dn.innerHTML=nav.map(function(n){return'<button class="nav-link" id="dnav-'+n.id+'" onclick="navTo(\''+n.id+'\')">'+n.icon+' '+n.label+'</button>';}).join('');
+  var bn=document.getElementById('bottom-nav');
+  bn.innerHTML='<div class="bottom-nav-items">'+nav.map(function(n){return'<button class="bnav-item" id="bnav-'+n.id+'" onclick="navTo(\''+n.id+'\')"><span class="icon">'+n.icon+'</span>'+n.label+'</button>';}).join('')+'</div>';
+}
+
+function navTo(id){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-link,.bnav-item').forEach(function(b){b.classList.remove('active');});
+  var pg=document.getElementById('page-'+id);
+  if(pg) pg.classList.add('active');
+  var dn=document.getElementById('dnav-'+id);if(dn)dn.classList.add('active');
+  var bn=document.getElementById('bnav-'+id);if(bn)bn.classList.add('active');
+  if(id==='dashboard')renderDashboard();
+  if(id==='dogs')renderMyDogs();
+  if(id==='book'){renderBookDogs();renderBookCalendar();}
+  if(id==='reservations')renderMyReservations();
+  if(id==='admin-dash')renderAdminDash();
+  if(id==='admin-reservations')renderAdminReservations();
+  if(id==='admin-calendar')renderAdminCalendar();
+  if(id==='admin-users')renderAdminUsers();
+  if(id==='admin-settings')applySettings();
+}
+
+// ── FORMULA ──
+function calcCharge(rate,dropDt,pickDt){
+  if(!rate||!dropDt||!pickDt)return null;
+  var ms=new Date(pickDt)-new Date(dropDt);
+  if(ms<=0)return null;
+  var fullDays=Math.floor(ms/86400000);
+  var remH=(ms%86400000)/3600000;
+  var billable=Math.max(fullDays>0?fullDays:1,settings.minDays||1);
+  var base=rate*billable;
+  var isSurcharge=remH>(settings.threshold||3);
+  var surcharge=isSurcharge?rate*(settings.surchargePct||50)/100:0;
+  return{total:base+surcharge,base:base,surcharge:surcharge,billable:billable,remH:remH,isSurcharge:isSurcharge,fullDays:fullDays};
+}
+
+function getDogRate(dog){
+  return dog&&dog.rate?parseFloat(dog.rate):parseFloat(settings.defaultRate||50);
+}
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  if(!document.getElementById('page-dashboard').classList.contains('active'))return;
+  var sub=document.getElementById('dash-sub');
+  if(currentUserData)sub.textContent='Hello, '+esc(currentUserData.firstName||currentUserData.email)+'! Here\'s your boarding overview.';
+  document.getElementById('stat-dogs').textContent=myDogs.length;
+  var upcoming=myReservations.filter(function(r){return r.status==='upcoming'||r.status==='checked_in';});
+  document.getElementById('stat-upcoming').textContent=upcoming.length;
+  var spent=myReservations.reduce(function(s,r){return s+(r.total||0);},0);
+  document.getElementById('stat-spent').textContent='$'+spent.toFixed(0);
+  var list=document.getElementById('upcoming-list');
+  if(!upcoming.length){list.innerHTML='<div class="empty"><div class="ei">📅</div><h3>No upcoming stays</h3><p>Book a stay for your pup!</p><button class="btn btn-primary btn-sm" onclick="navTo(\'book\')">Book Now</button></div>';return;}
+  list.innerHTML=upcoming.slice(0,5).map(function(r){return resCard(r,false);}).join('');
+}
+
+// ── MY DOGS ──
+function renderMyDogs(){
+  var grid=document.getElementById('my-dogs-grid');
+  if(!grid)return;
+  if(!myDogs.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1;"><div class="ei">🐶</div><h3>No dogs yet</h3><p>Add your dog\'s profile to start booking.</p><button class="btn btn-primary" onclick="openDogModal()">＋ Add Dog</button></div>';
+    return;
+  }
+  grid.innerHTML=myDogs.map(function(d){
+    var rate=getDogRate(d);
+    return'<div class="card"><div class="card-body">'
+      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:.75rem;">'
+      +'<div class="avatar avatar-lg" style="background:'+(d.color?d.color.bg:'#EDE9FE')+';color:'+(d.color?d.color.tx:'#4C1D95')+';">'+initials(d.name)+'</div>'
+      +'<div><div style="font-family:\'Fraunces\',serif;font-size:16px;font-weight:500;">'+esc(d.name)+'</div>'
+      +(d.breed?'<div style="font-size:12px;color:var(--ink2);">'+esc(d.breed)+(d.size?' · '+esc(d.size):'')+'</div>':'')+'</div></div>'
+      +(d.notes?'<div style="font-size:12px;color:var(--ink3);font-style:italic;margin-bottom:8px;">'+esc(d.notes)+'</div>':'')
+      +'<div style="font-size:15px;font-weight:600;color:var(--accent);margin-bottom:10px;">$'+rate.toFixed(2)+' / 24h</div>'
+      +'<div style="display:flex;gap:6px;">'
+      +'<button class="btn btn-secondary btn-sm" onclick="openDogModal(\''+d.id+'\')">Edit</button>'
+      +'<button class="btn btn-danger btn-sm" onclick="deleteDog(\''+d.id+'\')">Delete</button>'
+      +'</div></div></div>';
+  }).join('');
+}
+
+function openDogModal(id){
+  editDogId=id||null;
+  var d=id?myDogs.concat(allDogs).find(function(x){return x.id===id;}):null;
+  document.getElementById('dog-modal-title').textContent=id?'Edit Dog':'Add Dog';
+  document.getElementById('f-name').value=d?d.name||'':'';
+  document.getElementById('f-breed').value=d?d.breed||'':'';
+  document.getElementById('f-size').value=d?d.size||'':'';
+  document.getElementById('f-rate').value=d&&d.rate?d.rate:'';
+  document.getElementById('f-notes').value=d?d.notes||'':'';
+  selColor=d&&d.color?d.color:COLORS[Math.floor(Math.random()*COLORS.length)];
+  buildDogSwatches();
+  renderDogCustomFields(d?d.custom||{}:{});
+  document.getElementById('dog-err').style.display='none';
+  openModal('dog-modal');
+  setTimeout(function(){document.getElementById('f-name').focus();},100);
+}
+
+function buildDogSwatches(){
+  document.getElementById('dog-color-swatches').innerHTML=COLORS.map(function(c,i){
+    return'<div class="swatch'+(c.bg===selColor.bg?' sel':'')+'" style="background:'+c.bg+';'+(c.bg===selColor.bg?'border-color:var(--ink);':'')+'" onclick="pickColor('+i+')"></div>';
+  }).join('');
+}
+function pickColor(i){selColor=COLORS[i];buildDogSwatches();}
+
+function renderDogCustomFields(vals){
+  var c=document.getElementById('dog-custom-fields');
+  if(!fieldDefs.length){c.innerHTML='';return;}
+  var html='<hr class="divider"/><div class="section-lbl">Custom Fields</div>';
+  fieldDefs.forEach(function(f){
+    var v=vals[f.id]!==undefined?vals[f.id]:'';
+    var inp='';
+    if(f.type==='text') inp='<input type="text" id="dcf-'+f.id+'" value="'+esc(v)+'"'+(f.required?' required':'')+'/>';
+    else if(f.type==='number') inp='<input type="number" id="dcf-'+f.id+'" value="'+esc(v)+'"'+(f.required?' required':'')+'/>';
+    else if(f.type==='date') inp='<input type="date" id="dcf-'+f.id+'" value="'+esc(v)+'"'+(f.required?' required':'')+'/>';
+    else if(f.type==='toggle') inp='<select id="dcf-'+f.id+'"><option value="">—</option><option value="true"'+(v===true||v==='true'?' selected':'')+'>Yes</option><option value="false"'+(v===false||v==='false'?' selected':'')+'>No</option></select>';
+    else if(f.type==='dropdown'){var opts=(f.options||[]).map(function(o){return'<option value="'+esc(o)+'"'+(v===o?' selected':'')+'>'+esc(o)+'</option>';}).join('');inp='<select id="dcf-'+f.id+'"><option value="">—</option>'+opts+'</select>';}
+    html+='<div class="fg"><label>'+esc(f.label)+(f.required?' *':'')+'</label>'+inp+'</div>';
+  });
+  c.innerHTML=html;
+}
+
+async function saveDog(){
+  var name=document.getElementById('f-name').value.trim();
+  var rateVal=document.getElementById('f-rate').value;
+  var err=document.getElementById('dog-err');err.style.display='none';
+  if(!name){err.textContent='Name is required.';err.style.display='block';return;}
+  var custom={};
+  fieldDefs.forEach(function(f){var el=document.getElementById('dcf-'+f.id);if(el){var v=el.value;if(f.type==='toggle')v=v==='true'?true:v==='false'?false:'';else if(f.type==='number')v=v?parseFloat(v):'';custom[f.id]=v;}});
+  var data={
+    userId:currentUser.uid,name:name,
+    breed:document.getElementById('f-breed').value.trim(),
+    size:document.getElementById('f-size').value,
+    rate:rateVal?parseFloat(rateVal):null,
+    notes:document.getElementById('f-notes').value.trim(),
+    color:selColor,custom:custom,updatedAt:Date.now()
+  };
+  try{
+    if(editDogId){await FB.setDoc('dogs',editDogId,data);}
+    else{data.createdAt=Date.now();await FB.addDoc('dogs',data);}
+    closeModal('dog-modal');toast('Dog saved ✓');
+  }catch(e){err.textContent='Save failed: '+e.message;err.style.display='block';}
+}
+
+async function deleteDog(id){
+  if(!confirm('Remove this dog?'))return;
+  try{await FB.deleteDoc('dogs',id);toast('Removed');}
+  catch(e){toast('Error: '+e.message);}
+}
+
+// ── BOOKING CALENDAR ──
+function renderBookCalendar(){
+  var c=document.getElementById('book-cal');if(!c)return;
+  c.innerHTML=buildCalendar(calState.year,calState.month,handleBookDateClick,'user');
+  // Remove old listener and add fresh one via delegation
+  c.onclick=function(e){
+    var el=e.target.closest('[data-key]');
+    if(el) handleBookDateClick(el.getAttribute('data-key'));
+    var fn=e.target.getAttribute('data-calfn')||( e.target.closest('[data-calfn]')&&e.target.closest('[data-calfn]').getAttribute('data-calfn'));
+    if(fn==='prevBookMonth') prevBookMonth();
+    else if(fn==='nextBookMonth') nextBookMonth();
+  };
+}
+
+function renderAdminCalendar(){
+  var c=document.getElementById('admin-cal');if(!c)return;
+  c.innerHTML=buildCalendar(adminCalState.year,adminCalState.month,handleAdminDateClick,'admin');
+  c.onclick=function(e){
+    var el=e.target.closest('[data-key]');
+    if(el) handleAdminDateClick(el.getAttribute('data-key'));
+    var fn=e.target.getAttribute('data-calfn')||(e.target.closest('[data-calfn]')&&e.target.closest('[data-calfn]').getAttribute('data-calfn'));
+    if(fn==='prevAdminMonth') prevAdminMonth();
+    else if(fn==='nextAdminMonth') nextAdminMonth();
+  };
+}
+
+function buildCalendar(year,month,clickFn,mode){
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var today=new Date();today.setHours(0,0,0,0);
+  var first=new Date(year,month,1).getDay();
+  var days=new Date(year,month+1,0).getDate();
+  var prevFn=mode==='user'?'prevBookMonth':'prevAdminMonth';
+  var nextFn=mode==='user'?'nextBookMonth':'nextAdminMonth';
+  var html='<div class="cal-nav">'
+    +'<button data-calfn="'+prevFn+'">‹</button>'
+    +'<span class="cal-month">'+months[month]+' '+year+'</span>'
+    +'<button data-calfn="'+nextFn+'">›</button>'
+    +'</div><div class="cal-grid">';
+  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(function(d){html+='<div class="cal-day-name">'+d+'</div>';});
+  for(var i=0;i<first;i++)html+='<div class="cal-day empty"></div>';
+  for(var d=1;d<=days;d++){
+    var key=dateKey(year,month,d);
+    var dt=new Date(year,month,d);dt.setHours(0,0,0,0);
+    var cls='cal-day';
+    var isPast=dt<today;
+    var av=availability[key];
+    var isBooked=isDateBooked(key);
+    var isSelected=mode==='user'?(key===bookDropDate||key===bookPickDate||isInRange(key)):selectedCalDates.indexOf(key)>=0;
+    if(isPast&&mode==='user')cls+=' disabled';
+    else if(isSelected)cls+=' selected';
+    else if(isBooked)cls+=' booked';
+    else if(av==='unavailable')cls+=' unavailable';
+    else if(av==='available')cls+=' available';
+    else if(!isPast)cls+=' available';
+    if(dt.toDateString()===today.toDateString())cls+=' today';
+    // Use data-key instead of inline onclick — event delegation handles clicks
+    var clickable=!(isPast&&mode==='user');
+    html+='<div class="'+cls+'"'+(clickable?' data-key="'+key+'"':'')+'>'+d+'</div>';
+  }
+  html+='</div>';
+  return html;
+}
+
+function isDateBooked(key){
+  var recs=isAdmin?allReservations:myReservations;
+  return recs.some(function(r){
+    if(r.status==='cancelled')return false;
+    if(!r.dropDate||!r.pickDate)return false;
+    var drop=r.dropDate.substring(0,10),pick=r.pickDate.substring(0,10);
+    return key>=drop&&key<=pick;
+  });
+}
+
+function isInRange(key){
+  if(!bookDropDate||!bookPickDate)return false;
+  return key>bookDropDate&&key<bookPickDate;
+}
+
+function handleBookDateClick(key){
+  var av=availability[key];
+  if(av==='unavailable'){toast('This date is not available');return;}
+  if(!bookDropDate||bookPickDate){bookDropDate=key;bookPickDate=null;}
+  else if(key<bookDropDate){bookDropDate=key;}
+  else{bookPickDate=key;}
+  renderBookCalendar();
+  updateBookDateDisplay();
+  recalcBooking();
+}
+
+function handleAdminDateClick(key){
+  var idx=selectedCalDates.indexOf(key);
+  if(idx>=0)selectedCalDates.splice(idx,1);
+  else selectedCalDates.push(key);
+  renderAdminCalendar();
+}
+
+function prevBookMonth(){calState.month--;if(calState.month<0){calState.month=11;calState.year--;}renderBookCalendar();}
+function nextBookMonth(){calState.month++;if(calState.month>11){calState.month=0;calState.year++;}renderBookCalendar();}
+function prevAdminMonth(){adminCalState.month--;if(adminCalState.month<0){adminCalState.month=11;adminCalState.year--;}renderAdminCalendar();}
+function nextAdminMonth(){adminCalState.month++;if(adminCalState.month>11){adminCalState.month=0;adminCalState.year++;}renderAdminCalendar();}
+
+function updateBookDateDisplay(){
+  var el=document.getElementById('book-date-display');if(!el)return;
+  if(bookDropDate&&bookPickDate){
+    el.innerHTML='<span style="color:var(--green);font-weight:500;">'+fmtDate(bookDropDate)+' → '+fmtDate(bookPickDate)+'</span>';
+  } else if(bookDropDate){
+    el.innerHTML='<span style="color:var(--ink2);">Drop-off: '+fmtDate(bookDropDate)+' — now pick a check-out date</span>';
+  } else {el.innerHTML='';}
+}
+
+async function markDates(status){
+  if(!selectedCalDates.length){toast('Select dates first');return;}
+  var writes=selectedCalDates.map(function(key){availability[key]=status;return{col:'availability',id:key,data:{status:status,updatedAt:Date.now()}};});
+  await FB.batchSet(writes);
+  selectedCalDates=[];
+  renderAdminCalendar();
+  toast(selectedCalDates.length+' dates marked as '+status);
+  toast('Dates updated ✓');
+}
+
+async function markMonth(status){
+  var year=adminCalState.year,month=adminCalState.month;
+  var days=new Date(year,month+1,0).getDate();
+  var writes=[];
+  for(var d=1;d<=days;d++){var key=dateKey(year,month,d);availability[key]=status;writes.push({col:'availability',id:key,data:{status:status,updatedAt:Date.now()}});}
+  await FB.batchSet(writes);
+  renderAdminCalendar();
+  toast('Entire month marked as '+status);
+}
+
+function clearSelection(){selectedCalDates=[];renderAdminCalendar();}
+
+// ── BOOKING ──
+function renderBookDogs(){
+  var list=document.getElementById('book-dog-list');if(!list)return;
+  var dogs=isAdmin?allDogs:myDogs;
+  if(!dogs.length){list.innerHTML='<p style="font-size:13px;color:var(--ink3);">No dogs added yet. <a href="#" onclick="navTo(\'dogs\')">Add a dog first.</a></p>';return;}
+  list.innerHTML=dogs.map(function(d){
+    var rate=getDogRate(d);
+    return'<div class="dp-item'+(pendingBooking&&pendingBooking.dogId===d.id?' sel':'')+'" onclick="selectBookDog(\''+d.id+'\')" style="display:flex;align-items:center;gap:8px;padding:9px 11px;border:1.5px solid var(--border);border-radius:var(--r-sm);cursor:pointer;margin-bottom:5px;transition:all .15s;">'
+      +'<div class="avatar avatar-sm" style="background:'+(d.color?d.color.bg:'#EDE9FE')+';color:'+(d.color?d.color.tx:'#4C1D95')+';">'+initials(d.name)+'</div>'
+      +'<div style="flex:1;"><div style="font-weight:500;font-size:13px;">'+esc(d.name)+'</div><div style="font-size:11px;color:var(--ink3);">$'+rate.toFixed(2)+'/24h'+(d.breed?' · '+esc(d.breed):'')+'</div></div>'
+      +'<div style="width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">'+(pendingBooking&&pendingBooking.dogId===d.id?'<span style="color:var(--accent);">✓</span>':'')+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function selectBookDog(id){
+  pendingBooking=pendingBooking||{};pendingBooking.dogId=id;
+  renderBookDogs();recalcBooking();
+}
+
+function recalcBooking(){
+  var cp=document.getElementById('cost-preview');
+  var btn=document.getElementById('book-confirm-btn');
+  if(!cp)return;
+  if(!pendingBooking||!pendingBooking.dogId||!bookDropDate||!bookPickDate){
+    cp.innerHTML='<p style="font-size:13px;color:var(--ink3);">Select a dog and date range to see cost.</p>';
+    if(btn)btn.disabled=true;return;
+  }
+  var dogs=isAdmin?allDogs:myDogs;
+  var dog=dogs.find(function(d){return d.id===pendingBooking.dogId;});
+  if(!dog){if(btn)btn.disabled=true;return;}
+  var dropTime=document.getElementById('book-droptime').value||'09:00';
+  var pickTime=document.getElementById('book-picktime').value||'09:00';
+  var dropDt=bookDropDate+'T'+dropTime;
+  var pickDt=bookPickDate+'T'+pickTime;
+  var rate=getDogRate(dog);
+  var res=calcCharge(rate,dropDt,pickDt);
+  if(!res){cp.innerHTML='<p style="font-size:13px;color:var(--accent);">Invalid dates.</p>';if(btn)btn.disabled=true;return;}
+  pendingBooking.dropDt=dropDt;pendingBooking.pickDt=pickDt;pendingBooking.total=res.total;pendingBooking.rate=rate;
+  cp.innerHTML='<div class="cost-preview">'
+    +'<div class="cost-row"><span>'+esc(dog.name)+'</span><span></span></div>'
+    +'<div class="cost-row"><span>'+res.billable+' day'+(res.billable!==1?'s':'')+' @ $'+rate.toFixed(2)+'/day</span><span>$'+res.base.toFixed(2)+'</span></div>'
+    +(res.isSurcharge?'<div class="cost-row" style="color:var(--amber);"><span>Late pickup surcharge ('+(settings.surchargePct||50)+'%)</span><span>$'+res.surcharge.toFixed(2)+'</span></div>':'')
+    +'<hr style="border:none;border-top:1px solid var(--accent-border);margin:8px 0;"/>'
+    +'<div style="display:flex;justify-content:space-between;align-items:baseline;"><span style="font-weight:600;">Total</span><span class="total">$'+res.total.toFixed(2)+'</span></div>'
+    +'</div>';
+  if(btn)btn.disabled=false;
+}
+
+function confirmBooking(){
+  if(!pendingBooking||!pendingBooking.dogId||!pendingBooking.dropDt||!pendingBooking.pickDt){toast('Select dog and dates');return;}
+  var dogs=isAdmin?allDogs:myDogs;
+  var dog=dogs.find(function(d){return d.id===pendingBooking.dogId;});
+  var body=document.getElementById('confirm-modal-body');
+  body.innerHTML='<div style="text-align:center;margin-bottom:1.1rem;">'
+    +'<div class="avatar avatar-lg" style="background:'+(dog.color?dog.color.bg:'#EDE9FE')+';color:'+(dog.color?dog.color.tx:'#4C1D95')+'margin:0 auto .75rem;">'+initials(dog.name)+'</div>'
+    +'<div style="font-family:\'Fraunces\',serif;font-size:18px;">'+esc(dog.name)+'</div>'
+    +'</div>'
+    +'<div style="background:var(--surface2);border-radius:var(--r-sm);padding:.85rem;">'
+    +'<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;"><span style="color:var(--ink2);">Drop-off</span><span>'+fmtDateTime(pendingBooking.dropDt)+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;"><span style="color:var(--ink2);">Pick-up</span><span>'+fmtDateTime(pendingBooking.pickDt)+'</span></div>'
+    +'<hr style="border:none;border-top:1px solid var(--border);margin:8px 0;"/>'
+    +'<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:600;"><span>Total</span><span style="color:var(--accent);">$'+pendingBooking.total.toFixed(2)+'</span></div>'
+    +'</div>';
+  openModal('confirm-modal');
+}
+
+async function submitBooking(){
+  if(!pendingBooking)return;
+  var btn=document.getElementById('submit-book-btn');
+  btn.disabled=true;btn.textContent='Booking…';
+  try{
+    var dogs=isAdmin?allDogs:myDogs;
+    var dog=dogs.find(function(d){return d.id===pendingBooking.dogId;});
+    var booking={
+      userId:currentUser.uid,
+      userEmail:currentUser.email,
+      userName:(currentUserData?currentUserData.firstName+' '+(currentUserData.lastName||''):'').trim(),
+      dogId:pendingBooking.dogId,
+      dogName:dog?dog.name:'',
+      dogColor:dog?dog.color:null,
+      dropDate:pendingBooking.dropDt,
+      pickDate:pendingBooking.pickDt,
+      rate:pendingBooking.rate,
+      total:pendingBooking.total,
+      status:'upcoming',
+      checkedIn:null,checkedOut:null,
+      createdAt:Date.now()
+    };
+    await FB.addDoc('reservations',booking);
+    closeModal('confirm-modal');
+    pendingBooking=null;bookDropDate=null;bookPickDate=null;
+    renderBookCalendar();updateBookDateDisplay();
+    var cp=document.getElementById('cost-preview');
+    if(cp)cp.innerHTML='<p style="font-size:13px;color:var(--ink3);">Select a dog and dates to see cost.</p>';
+    toast('Booking confirmed! 🐾');
+    navTo('reservations');
+  }catch(e){toast('Booking failed: '+e.message);}
+  finally{btn.disabled=false;btn.textContent='Confirm & Book';}
+}
+
+// ── MY RESERVATIONS ──
+function renderMyReservations(){
+  var list=document.getElementById('my-reservations-list');if(!list)return;
+  if(!myReservations.length){list.innerHTML='<div class="empty"><div class="ei">📋</div><h3>No reservations yet</h3><p>Book a stay for your dog!</p><button class="btn btn-primary btn-sm" onclick="navTo(\'book\')">Book Now</button></div>';return;}
+  list.innerHTML=myReservations.map(function(r){return resCard(r,false);}).join('');
+}
+
+function resCard(r,admin){
+  var statusColors={upcoming:'badge-blue',checked_in:'badge-green',completed:'badge-gray',cancelled:'badge-red'};
+  var statusLabels={upcoming:'Upcoming',checked_in:'Checked In',completed:'Completed',cancelled:'Cancelled'};
+  var clr=r.dogColor||{bg:'#EDE9FE',tx:'#4C1D95'};
+  return'<div class="res-card">'
+    +'<div class="avatar" style="background:'+clr.bg+';color:'+clr.tx+';">'+initials(r.dogName||'?')+'</div>'
+    +'<div class="res-card-body">'
+    +'<div class="res-title">'+esc(r.dogName||'Unknown dog')+(admin?'<span style="font-size:12px;color:var(--ink3);"> · '+esc(r.userName||r.userEmail||'')+'</span>':'')+'</div>'
+    +'<div class="res-meta">'+fmtDateTime(r.dropDate)+' → '+fmtDateTime(r.pickDate)+'</div>'
+    +(r.checkedIn?'<div class="res-meta" style="color:var(--green);">✓ Checked in '+fmtDateTime(r.checkedIn)+'</div>':'')
+    +(r.checkedOut?'<div class="res-meta" style="color:var(--ink3);">✓ Checked out '+fmtDateTime(r.checkedOut)+'</div>':'')
+    +'<div style="display:flex;align-items:center;gap:8px;margin-top:6px;">'
+    +'<span class="badge '+(statusColors[r.status]||'badge-gray')+'">'+(statusLabels[r.status]||r.status)+'</span>'
+    +(admin?'<button class="btn btn-ghost btn-xs" onclick="openResDetail(\''+r.id+'\')">View →</button>':'')
+    +(r.status==='upcoming'&&!admin?'<button class="btn btn-danger btn-xs" onclick="cancelReservation(\''+r.id+'\')">Cancel</button>':'')
+    +'</div></div>'
+    +'<div class="res-amount">$'+(r.total||0).toFixed(2)+'</div>'
+    +'</div>';
+}
+
+async function cancelReservation(id){
+  if(!confirm('Cancel this reservation?'))return;
+  try{await FB.updateDoc('reservations',id,{status:'cancelled'});toast('Reservation cancelled');}
+  catch(e){toast('Error: '+e.message);}
+}
+
+// ── ADMIN DASHBOARD ──
+function renderAdminDash(){
+  if(!document.getElementById('page-admin-dash').classList.contains('active'))return;
+  document.getElementById('adm-stat-dogs').textContent=allDogs.length;
+  var checkedIn=allReservations.filter(function(r){return r.status==='checked_in';});
+  document.getElementById('adm-stat-checkedin').textContent=checkedIn.length;
+  var revenue=allReservations.filter(function(r){return r.status!=='cancelled';}).reduce(function(s,r){return s+(r.total||0);},0);
+  document.getElementById('adm-stat-revenue').textContent='$'+revenue.toFixed(0);
+  var today=new Date();today.setHours(0,0,0,0);
+  var todayKey=dateKey(today.getFullYear(),today.getMonth(),today.getDate());
+  var todayRecs=allReservations.filter(function(r){return r.dropDate&&r.dropDate.startsWith(todayKey)||r.pickDate&&r.pickDate.startsWith(todayKey);});
+  var todayList=document.getElementById('admin-today-list');
+  if(!todayRecs.length)todayList.innerHTML='<div class="empty"><div class="ei">🌅</div><p>No activity today.</p></div>';
+  else todayList.innerHTML=todayRecs.map(function(r){return resCard(r,true);}).join('');
+  var checkinList=document.getElementById('admin-checkin-list');
+  var pending=allReservations.filter(function(r){return r.status==='upcoming';}).slice(0,5);
+  if(!pending.length)checkinList.innerHTML='<div class="empty"><div class="ei">✓</div><p>No pending check-ins.</p></div>';
+  else checkinList.innerHTML=pending.map(function(r){
+    return'<div class="checkin-strip">'
+      +'<span>🐶 <strong>'+esc(r.dogName)+'</strong> — '+fmtDate(r.dropDate)+'</span>'
+      +'<button class="btn btn-success btn-xs" onclick="checkIn(\''+r.id+'\')">Check In</button>'
+      +'</div>';
+  }).join('');
+}
+
+// ── ADMIN RESERVATIONS ──
+function renderAdminReservations(){
+  var list=document.getElementById('admin-res-table');if(!list)return;
+  var filter=document.getElementById('res-filter');
+  var fval=filter?filter.value:'all';
+  var recs=fval==='all'?allReservations:allReservations.filter(function(r){return r.status===fval;});
+  if(!recs.length){list.innerHTML='<div class="empty"><div class="ei">📋</div><h3>No reservations</h3></div>';return;}
+  list.innerHTML='<div class="card"><div style="overflow-x:auto;"><table class="tbl"><thead><tr><th>Dog</th><th>Owner</th><th>Drop-off</th><th>Pick-up</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody>'
+    +recs.map(function(r){
+      var sc={upcoming:'badge-blue',checked_in:'badge-green',completed:'badge-gray',cancelled:'badge-red'};
+      var sl={upcoming:'Upcoming',checked_in:'Checked In',completed:'Completed',cancelled:'Cancelled'};
+      var clr=r.dogColor||{bg:'#EDE9FE',tx:'#4C1D95'};
+      return'<tr>'
+        +'<td><div style="display:flex;align-items:center;gap:7px;"><div class="avatar avatar-sm" style="background:'+clr.bg+';color:'+clr.tx+';">'+initials(r.dogName||'?')+'</div>'+esc(r.dogName||'—')+'</div></td>'
+        +'<td style="font-size:12px;color:var(--ink2);">'+esc(r.userName||r.userEmail||'—')+'</td>'
+        +'<td style="font-size:12px;">'+fmtDateTime(r.dropDate)+'</td>'
+        +'<td style="font-size:12px;">'+fmtDateTime(r.pickDate)+'</td>'
+        +'<td style="font-weight:600;">$'+(r.total||0).toFixed(2)+'</td>'
+        +'<td><span class="badge '+(sc[r.status]||'badge-gray')+'">'+(sl[r.status]||r.status)+'</span></td>'
+        +'<td><button class="btn btn-ghost btn-xs" onclick="openResDetail(\''+r.id+'\')">Manage</button></td>'
+        +'</tr>';
+    }).join('')
+    +'</tbody></table></div></div>';
+}
+
+function openResDetail(id){
+  var r=allReservations.find(function(x){return x.id===id;})||myReservations.find(function(x){return x.id===id;});
+  if(!r)return;
+  var clr=r.dogColor||{bg:'#EDE9FE',tx:'#4C1D95'};
+  var sc={upcoming:'badge-blue',checked_in:'badge-green',completed:'badge-gray',cancelled:'badge-red'};
+  var sl={upcoming:'Upcoming',checked_in:'Checked In',completed:'Completed',cancelled:'Cancelled'};
+  document.getElementById('res-detail-body').innerHTML=
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;">'
+    +'<div class="avatar avatar-lg" style="background:'+clr.bg+';color:'+clr.tx+';">'+initials(r.dogName||'?')+'</div>'
+    +'<div><div style="font-family:\'Fraunces\',serif;font-size:18px;">'+esc(r.dogName||'—')+'</div>'
+    +'<div style="font-size:13px;color:var(--ink2);">'+esc(r.userName||r.userEmail||'—')+'</div>'
+    +'<span class="badge '+(sc[r.status]||'badge-gray')+'" style="margin-top:3px;">'+(sl[r.status]||r.status)+'</span>'
+    +'</div></div>'
+    +'<div style="background:var(--surface2);border-radius:var(--r-sm);padding:.9rem;">'
+    +'<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;"><span style="color:var(--ink2);">Drop-off</span><span>'+fmtDateTime(r.dropDate)+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;"><span style="color:var(--ink2);">Pick-up</span><span>'+fmtDateTime(r.pickDate)+'</span></div>'
+    +(r.checkedIn?'<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;color:var(--green);"><span>Checked In</span><span>'+fmtDateTime(r.checkedIn)+'</span></div>':'')
+    +(r.checkedOut?'<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;color:var(--ink3);"><span>Checked Out</span><span>'+fmtDateTime(r.checkedOut)+'</span></div>':'')
+    +'<hr style="border:none;border-top:1px solid var(--border);margin:8px 0;"/>'
+    +'<div style="display:flex;justify-content:space-between;font-weight:600;"><span>Total</span><span style="color:var(--accent);">$'+(r.total||0).toFixed(2)+'</span></div>'
+    +'</div>';
+  var ftr=document.getElementById('res-detail-ftr');
+  var btns='<button class="btn btn-secondary" onclick="closeModal(\'res-detail-modal\')">Close</button>';
+  if(isAdmin){
+    if(r.status==='upcoming')btns+='<button class="btn btn-success btn-sm" onclick="checkIn(\''+r.id+'\');closeModal(\'res-detail-modal\')">✓ Check In</button>';
+    if(r.status==='checked_in')btns+='<button class="btn btn-primary btn-sm" onclick="checkOut(\''+r.id+'\');closeModal(\'res-detail-modal\')">✓ Check Out</button>';
+    if(r.status!=='cancelled'&&r.status!=='completed')btns+='<button class="btn btn-danger btn-sm" onclick="adminCancelRes(\''+r.id+'\');closeModal(\'res-detail-modal\')">Cancel</button>';
+  }
+  ftr.innerHTML=btns;
+  openModal('res-detail-modal');
+}
+
+async function checkIn(id){
+  try{await FB.updateDoc('reservations',id,{status:'checked_in',checkedIn:new Date().toISOString()});toast('Checked in!');}
+  catch(e){toast('Error: '+e.message);}
+}
+async function checkOut(id){
+  try{await FB.updateDoc('reservations',id,{status:'completed',checkedOut:new Date().toISOString()});toast('Checked out!');}
+  catch(e){toast('Error: '+e.message);}
+}
+async function adminCancelRes(id){
+  if(!confirm('Cancel this reservation?'))return;
+  try{await FB.updateDoc('reservations',id,{status:'cancelled'});toast('Cancelled');}
+  catch(e){toast('Error: '+e.message);}
+}
+
+// ── ADMIN USERS ──
+function renderAdminUsers(){
+  var list=document.getElementById('admin-users-table');if(!list)return;
+  if(!allUsers.length){list.innerHTML='<div class="empty"><div class="ei">👥</div><h3>No users yet</h3></div>';return;}
+  list.innerHTML='<div class="card"><div style="overflow-x:auto;"><table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Dogs</th><th>Bookings</th><th></th></tr></thead><tbody>'
+    +allUsers.map(function(u){
+      var userDogs=allDogs.filter(function(d){return d.userId===u.id;}).length;
+      var userRes=allReservations.filter(function(r){return r.userId===u.id;}).length;
+      return'<tr>'
+        +'<td><div style="display:flex;align-items:center;gap:7px;"><div class="avatar avatar-sm" style="background:#EDE9FE;color:#4C1D95;">'+initials((u.firstName||'')+' '+(u.lastName||''))+'</div>'+esc((u.firstName||'')+' '+(u.lastName||''))+'</div></td>'
+        +'<td style="font-size:12px;">'+esc(u.email||'—')+'</td>'
+        +'<td style="font-size:12px;">'+esc(u.phone||'—')+'</td>'
+        +'<td><span class="badge '+(u.role==='admin'?'badge-amber':'badge-blue')+'">'+esc(u.role||'user')+'</span></td>'
+        +'<td style="text-align:center;">'+userDogs+'</td>'
+        +'<td style="text-align:center;">'+userRes+'</td>'
+        +'<td>'+(u.role!=='admin'?'<button class="btn btn-ghost btn-xs" onclick="makeAdmin(\''+u.id+'\')">Make Admin</button>':'')+'</td>'
+        +'</tr>';
+    }).join('')
+    +'</tbody></table></div></div>';
+}
+
+async function makeAdmin(id){
+  if(!confirm('Grant admin access to this user?'))return;
+  try{await FB.updateDoc('users',id,{role:'admin'});toast('Admin access granted');}
+  catch(e){toast('Error: '+e.message);}
+}
+
+// ── SETTINGS ──
+function applySettings(){
+  var t=document.getElementById('set-threshold');var p=document.getElementById('set-surcharge');var m=document.getElementById('set-mindays');var r=document.getElementById('set-default-rate');
+  if(t)t.value=settings.threshold||3;if(p)p.value=settings.surchargePct||50;if(m)m.value=settings.minDays||1;if(r)r.value=settings.defaultRate||50;
+  updateFormulaUI();
+  renderFieldDefs();
+  var cfg=lsGet('fbConfig');
+  if(cfg){
+    if(document.getElementById('fb-apiKey'))document.getElementById('fb-apiKey').value=cfg.apiKey||'';
+    if(document.getElementById('fb-projectId'))document.getElementById('fb-projectId').value=cfg.projectId||'';
+    if(document.getElementById('fb-authDomain'))document.getElementById('fb-authDomain').value=cfg.authDomain||'';
+    if(document.getElementById('fb-appId'))document.getElementById('fb-appId').value=cfg.appId||'';
+  }
+  var badge=document.getElementById('fb-badge');
+  if(badge){badge.className='badge '+(fbDb?'badge-green':'badge-red');badge.textContent=fbDb?'Connected':'Not connected';}
+}
+
+function updateFormulaUI(){
+  var t=document.getElementById('set-threshold');var p=document.getElementById('set-surcharge');var m=document.getElementById('set-mindays');
+  if(!t)return;
+  document.getElementById('set-threshold-val').textContent=t.value+'h';
+  document.getElementById('set-surcharge-val').textContent=p.value+'%';
+  document.getElementById('set-mindays-val').textContent=m.value;
+  var fp=document.getElementById('formula-preview');
+  if(fp)fp.innerHTML='<strong>charge</strong> = rate × max(fullDays, <strong>'+m.value+'</strong>)<br>if remainderHours &gt; <strong>'+t.value+'h</strong>: charge += rate × <strong>'+p.value+'%</strong><br>Default rate: <strong>$'+(document.getElementById('set-default-rate')?document.getElementById('set-default-rate').value||50:50)+'/day</strong>';
+}
+
+async function saveSettings(){
+  var t=document.getElementById('set-threshold');var p=document.getElementById('set-surcharge');var m=document.getElementById('set-mindays');var r=document.getElementById('set-default-rate');
+  settings={threshold:parseFloat(t.value),surchargePct:parseFloat(p.value),minDays:parseInt(m.value),defaultRate:parseFloat(r?r.value:50)||50};
+  lsSet('settings',settings);
+  if(fbDb)await FB.setDoc('settings','global',settings);
+  toast('Settings saved ✓');
+}
+
+// ── CUSTOM FIELDS ──
+function openFieldModal(id){
+  editFieldId=id||null;
+  var f=id?fieldDefs.find(function(x){return x.id===id;}):null;
+  document.getElementById('ff-label').value=f?f.label||'':'';
+  document.getElementById('ff-type').value=f?f.type||'text':'text';
+  document.getElementById('ff-required').checked=f?f.required||false:false;
+  document.getElementById('ff-err').style.display='none';
+  renderFieldTypeOpts(f);
+  openModal('field-modal');
+}
+function renderFieldTypeOpts(existing){
+  var type=document.getElementById('ff-type').value;
+  var c=document.getElementById('ff-extra');
+  if(type==='dropdown'){var opts=existing&&existing.options?existing.options:[];c.innerHTML='<div class="fg"><label>Options (one per line)</label><textarea id="ff-options" rows="4" style="font-size:13px;">'+opts.join('\n')+'</textarea></div>';}
+  else c.innerHTML='';
+}
+async function saveFieldDef(){
+  var label=document.getElementById('ff-label').value.trim();
+  var type=document.getElementById('ff-type').value;
+  var err=document.getElementById('ff-err');err.style.display='none';
+  if(!label){err.textContent='Label required.';err.style.display='block';return;}
+  var field={id:editFieldId||('cf_'+Date.now()),label:label,type:type,required:document.getElementById('ff-required').checked};
+  if(type==='dropdown'){var oe=document.getElementById('ff-options');var opts=oe?oe.value.split('\n').map(function(s){return s.trim();}).filter(Boolean):[];if(!opts.length){err.textContent='Add at least one option.';err.style.display='block';return;}field.options=opts;}
+  if(editFieldId)fieldDefs=fieldDefs.map(function(f){return f.id===editFieldId?field:f;});
+  else fieldDefs.push(field);
+  lsSet('fieldDefs',fieldDefs);
+  if(fbDb)await FB.setDoc('settings','fieldDefs',{defs:fieldDefs});
+  closeModal('field-modal');renderFieldDefs();toast('Field saved ✓');
+}
+function renderFieldDefs(){
+  var c=document.getElementById('field-defs-list');if(!c)return;
+  if(!fieldDefs.length){c.innerHTML='<p style="font-size:13px;color:var(--ink3);">No custom fields yet.</p>';return;}
+  c.innerHTML=fieldDefs.map(function(f){
+    return'<div style="display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid var(--border);">'
+      +'<span class="badge badge-blue" style="font-size:10px;">'+f.type+'</span>'
+      +'<span style="flex:1;font-size:13px;font-weight:500;">'+esc(f.label)+'</span>'
+      +(f.required?'<span class="badge badge-amber" style="font-size:10px;">req</span>':'')
+      +'<button class="btn btn-ghost btn-xs" onclick="openFieldModal(\''+f.id+'\')">✏️</button>'
+      +'<button class="btn btn-ghost btn-xs" onclick="deleteFieldDef(\''+f.id+'\')">🗑</button>'
+      +'</div>';
+  }).join('');
+}
+async function deleteFieldDef(id){
+  if(!confirm('Remove this field?'))return;
+  fieldDefs=fieldDefs.filter(function(f){return f.id!==id;});
+  lsSet('fieldDefs',fieldDefs);
+  if(fbDb)await FB.setDoc('settings','fieldDefs',{defs:fieldDefs});
+  renderFieldDefs();toast('Field removed');
+}
+
+// ── FIREBASE SETTINGS ──
+function connectFirebase(){
+  var cfg={apiKey:document.getElementById('fb-apiKey').value.trim(),projectId:document.getElementById('fb-projectId').value.trim(),authDomain:document.getElementById('fb-authDomain').value.trim(),appId:document.getElementById('fb-appId').value.trim()};
+  if(!cfg.apiKey||!cfg.projectId){toast('Enter API Key and Project ID');return;}
+  lsSet('fbConfig',cfg);
+  toast('Config saved — reloading…');
+  setTimeout(function(){location.reload();},1000);
+}
+function disconnectFirebase(){
+  lsSet('fbConfig',null);
+  FB.signOut();
+  toast('Disconnected — reloading…');
+  setTimeout(function(){location.reload();},1000);
+}
+
+// ── BIND AUTH BUTTONS ──
+// Script tag is at end of body, so DOM is already ready when this runs.
+// Use a small timeout as extra safety to ensure all functions are parsed.
+function bindAuthButtons() {
+  function on(id, fn) {
+    var el = document.getElementById(id);
+    if (el) { el.onclick = fn; }
+    else { console.warn('bindAuthButtons: element not found:', id); }
+  }
+  on('btn-show-fb-panel',  showFirebasePanel);
+  on('btn-save-firebase',  saveAndConnectFirebase);
+  on('btn-demo-mode',      showOfflineMode);
+  on('btn-toggle-help',    toggleSetupHelp);
+  on('btn-hide-help',      toggleSetupHelp);
+  on('login-btn',          doLogin);
+  on('reg-btn',            doRegister);
+  on('tab-login',          function() { showAuthTab('login'); });
+  on('tab-register',       function() { showAuthTab('register'); });
+
+  var loginEmail = document.getElementById('login-email');
+  var loginPass  = document.getElementById('login-pass');
+  var regPass2   = document.getElementById('reg-pass2');
+  if (loginEmail) loginEmail.onkeydown = function(e) { if (e.key==='Enter') doLogin(); };
+  if (loginPass)  loginPass.onkeydown  = function(e) { if (e.key==='Enter') doLogin(); };
+  if (regPass2)   regPass2.onkeydown   = function(e) { if (e.key==='Enter') doRegister(); };
+}
+bindAuthButtons();
+
+
+// ── DOG BREEDS LIST ──
+var DOG_BREEDS = [
+  'Affenpinscher','Afghan Hound','Airedale Terrier','Akita','Alaskan Malamute',
+  'American Bulldog','American Cocker Spaniel','American Eskimo Dog','American Pit Bull Terrier',
+  'American Staffordshire Terrier','Anatolian Shepherd','Australian Cattle Dog',
+  'Australian Shepherd','Australian Terrier','Basenji','Basset Hound','Beagle',
+  'Bearded Collie','Bedlington Terrier','Belgian Malinois','Belgian Sheepdog',
+  'Belgian Tervuren','Bernese Mountain Dog','Bichon Frise','Bloodhound','Border Collie',
+  'Border Terrier','Borzoi','Boston Terrier','Bouvier des Flandres','Boxer',
+  'Boykin Spaniel','Briard','Brittany Spaniel','Brussels Griffon','Bull Terrier',
+  'Bulldog','Bullmastiff','Cairn Terrier','Cane Corso','Cardigan Welsh Corgi',
+  'Cavalier King Charles Spaniel','Chesapeake Bay Retriever','Chihuahua',
+  'Chinese Crested','Chinese Shar-Pei','Chow Chow','Cocker Spaniel','Collie',
+  'Dachshund','Dalmatian','Doberman Pinscher','Dogo Argentino','English Bulldog',
+  'English Cocker Spaniel','English Setter','English Springer Spaniel',
+  'Field Spaniel','French Bulldog','German Pinscher','German Shepherd',
+  'German Shorthaired Pointer','German Wirehaired Pointer','Giant Schnauzer',
+  'Golden Retriever','Gordon Setter','Great Dane','Great Pyrenees',
+  'Greater Swiss Mountain Dog','Greyhound','Havanese','Ibizan Hound',
+  'Irish Setter','Irish Terrier','Irish Water Spaniel','Irish Wolfhound',
+  'Italian Greyhound','Jack Russell Terrier','Japanese Chin','Keeshond',
+  'Kerry Blue Terrier','Komondor','Kuvasz','Labrador Retriever','Lakeland Terrier',
+  'Leonberger','Lhasa Apso','Maltese','Manchester Terrier','Mastiff',
+  'Miniature Bull Terrier','Miniature Pinscher','Miniature Schnauzer','Mixed Breed',
+  'Neapolitan Mastiff','Newfoundland','Norfolk Terrier','Norwegian Elkhound',
+  'Norwich Terrier','Nova Scotia Duck Tolling Retriever','Old English Sheepdog',
+  'Papillon','Pekingese','Pembroke Welsh Corgi','Pharaoh Hound','Pointer',
+  'Pomeranian','Poodle (Miniature)','Poodle (Standard)','Poodle (Toy)',
+  'Portuguese Water Dog','Pug','Rat Terrier','Rhodesian Ridgeback','Rottweiler',
+  'Saint Bernard','Saluki','Samoyed','Schipperke','Scottish Deerhound',
+  'Scottish Terrier','Shetland Sheepdog','Shiba Inu','Shih Tzu','Siberian Husky',
+  'Silky Terrier','Skye Terrier','Smooth Fox Terrier','Soft Coated Wheaten Terrier',
+  'Spinone Italiano','Staffordshire Bull Terrier','Standard Schnauzer',
+  'Sussex Spaniel','Tibetan Mastiff','Tibetan Spaniel','Tibetan Terrier',
+  'Toy Fox Terrier','Vizsla','Weimaraner','Welsh Springer Spaniel','Welsh Terrier',
+  'West Highland White Terrier','Whippet','Wire Fox Terrier','Wirehaired Pointing Griffon',
+  'Xoloitzcuintli','Yorkshire Terrier'
+];
+
+// ── BREED AUTOCOMPLETE ──
+var breedHideTimer = null;
+
+function filterBreeds() {
+  var input = document.getElementById('f-breed');
+  var val = input.value.trim().toLowerCase();
+  var dd = document.getElementById('breed-dropdown');
+  if (!dd) return;
+  if (!val) { dd.style.display = 'none'; return; }
+  var matches = DOG_BREEDS.filter(function(b) { return b.toLowerCase().indexOf(val) >= 0; });
+  if (!matches.length) { dd.style.display = 'none'; return; }
+  dd.innerHTML = matches.slice(0, 10).map(function(b) {
+    var hi = b.replace(new RegExp('('+val.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')', 'gi'), '<strong>$1</strong>');
+    return '<div class="breed-opt" onmousedown="selectBreed(\'' + b.replace(/'/g,"\'") + '\')">' + hi + '</div>';
+  }).join('');
+  dd.style.display = 'block';
+}
+
+function showBreedList() {
+  var input = document.getElementById('f-breed');
+  var val = input.value.trim().toLowerCase();
+  var dd = document.getElementById('breed-dropdown');
+  if (!dd) return;
+  var list = val ? DOG_BREEDS.filter(function(b){ return b.toLowerCase().indexOf(val)>=0; }) : DOG_BREEDS.slice(0,10);
+  if (!list.length) return;
+  dd.innerHTML = list.slice(0,10).map(function(b) {
+    return '<div class="breed-opt" onmousedown="selectBreed(\'' + b.replace(/'/g,"\'") + '\')">' + b + '</div>';
+  }).join('');
+  dd.style.display = 'block';
+}
+
+function hideBreedList() {
+  // Small delay so mousedown on option fires before blur hides the list
+  breedHideTimer = setTimeout(function() {
+    var dd = document.getElementById('breed-dropdown');
+    if (dd) dd.style.display = 'none';
+  }, 200);
+}
+
+function selectBreed(breed) {
+  if (breedHideTimer) clearTimeout(breedHideTimer);
+  var input = document.getElementById('f-breed');
+  if (input) input.value = breed;
+  var dd = document.getElementById('breed-dropdown');
+  if (dd) dd.style.display = 'none';
+}
+window.filterBreeds  = filterBreeds;
+window.showBreedList = showBreedList;
+window.hideBreedList = hideBreedList;
+window.selectBreed   = selectBreed;
+
+// ── EXPOSE ALL FUNCTIONS TO GLOBAL SCOPE FOR INLINE ONCLICK ──
+window.navTo               = navTo;
+window.closeModal          = closeModal;
+window.openDogModal        = openDogModal;
+window.saveDog             = saveDog;
+window.deleteDog           = deleteDog;
+window.pickColor           = pickColor;
+window.openFieldModal      = openFieldModal;
+window.saveFieldDef        = saveFieldDef;
+window.deleteFieldDef      = deleteFieldDef;
+window.renderFieldTypeOpts = renderFieldTypeOpts;
+window.selectBookDog       = selectBookDog;
+window.confirmBooking      = confirmBooking;
+window.submitBooking       = submitBooking;
+window.cancelReservation   = cancelReservation;
+window.checkIn             = checkIn;
+window.checkOut            = checkOut;
+window.adminCancelRes      = adminCancelRes;
+window.openResDetail       = openResDetail;
+window.makeAdmin           = makeAdmin;
+window.saveSettings        = saveSettings;
+window.updateFormulaUI     = updateFormulaUI;
+window.connectFirebase     = connectFirebase;
+window.disconnectFirebase  = disconnectFirebase;
+window.markDates           = markDates;
+window.markMonth           = markMonth;
+window.clearSelection      = clearSelection;
+window.doLogin             = doLogin;
+window.doRegister          = doRegister;
+window.doLogout            = doLogout;
+window.showAuthTab         = showAuthTab;
+window.showFirebasePanel   = showFirebasePanel;
+window.saveAndConnectFirebase = saveAndConnectFirebase;
+window.showOfflineMode     = showOfflineMode;
+window.toggleSetupHelp     = toggleSetupHelp;
+window.prevBookMonth       = prevBookMonth;
+window.nextBookMonth       = nextBookMonth;
+window.prevAdminMonth      = prevAdminMonth;
+window.nextAdminMonth      = nextAdminMonth;
+window.bindAuthButtons     = bindAuthButtons;
+
+</script>
+</body>
+</html>
